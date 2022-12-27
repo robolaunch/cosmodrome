@@ -17,7 +17,6 @@ Robot image pipeline produces images for [robolaunch Robot Operator](https://git
 
 <!-- - [Overview](#overview) -->
 - [Quick Start](#quick-start)
-<!-- - [Aims & Roadmap](#aims--roadmap) -->
 - [Contributing](#contributing)
 
 
@@ -44,7 +43,7 @@ See all images from [robolaunch's Docker Hub](https://hub.docker.com/u/robolaunc
 Clone the artifacts repository.
 
 ```bash
-git clone https://bitbucket.org/kaesystems/robolaunch-artifacts
+git clone https://github.com/robolaunch/robot-image-pipeline
 ```
 
 #### Prerequisites
@@ -69,7 +68,7 @@ export REBUILD_ROBOT="true"
 export ROS_DISTRO="foxy"
 export ROBOT_NAME="linorobot"
 
-cd robolaunch-artifacts/robot-operator/images
+cd robot-image-pipeline
 chmod +x ./build.sh
 ./build.sh
 ```
@@ -133,7 +132,7 @@ Select a robot. Options are listed under [`robot-operator/images/robot`](../imag
 If you do not set any environment variables that configure build script, you can configure your images interactively from the terminal.
 
 ```bash
-cd robolaunch-artifacts/robot-operator/images
+cd robot-image-pipeline
 chmod +x ./build.sh
 ./build.sh
 ```
@@ -142,13 +141,13 @@ chmod +x ./build.sh
 
 If you would like to inject your own images to this pipeline, you should add your Dockerfiles under one of these three directories:
 
-- `robot-operator/images/vdi/<new>`
+- `vdi/<new>`
   - if you want to add an Ubuntu desktop option
-- `robot-operator/images/ros/<new>`
+- `ros/<new>`
   - if you want to add a ROS distro
-- `robot-operator/images/robot/<new>`
+- `robot/<new>`
   - if you want to add a robot
-  
+
 <!-- ## Aims & Roadmap
 
 [EDIT THIS: Add roadmap items for the project.]
