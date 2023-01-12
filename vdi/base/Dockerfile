@@ -135,7 +135,7 @@ COPY ./add-render-group.sh /usr/bin/add-render-group.sh
 
 RUN chmod 755 /etc/vdi/install-driver.sh
 
-ENV NEKO_PASSWORD=neko
+ENV NEKO_PASSWORD=robolaunch
 ENV NEKO_PASSWORD_ADMIN=admin
 ENV RENDER_GID=
 
