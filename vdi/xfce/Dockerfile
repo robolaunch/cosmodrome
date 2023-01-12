@@ -13,6 +13,12 @@ RUN set -eux; apt-get update; \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 #
+#
+# set background
+RUN rm /usr/share/backgrounds/xfce/xfce-stripes.png
+COPY xfce-stripes.png /usr/share/backgrounds/xfce/
+
+#
 # copy configuation files and generate xorg.conf
 COPY generate-xorg.sh /etc/vdi
 COPY xorg.conf /etc/vdi
