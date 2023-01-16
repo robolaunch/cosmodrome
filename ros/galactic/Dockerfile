@@ -28,3 +28,6 @@ RUN apt update && apt install -y \
     python3-colcon-common-extensions \
     ascii \
     && rm -rf /var/lib/apt/lists/*
+
+# add FastRTPS
+RUN apt update && apt install ros-galactic-rmw-fastrtps-cpp -y
