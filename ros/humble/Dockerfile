@@ -11,6 +11,7 @@ RUN apt update && apt install -y \
     lsb-release \
     curl \
     ssh \
+    xcvt \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
