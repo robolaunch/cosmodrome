@@ -13,6 +13,7 @@ type BuildComponentInterface interface {
 type BuildComponent struct {
 	BuildComponentInterface
 	Image          string
+	Tag            string
 	BaseImage      string
 	Directory      string
 	DockerfilePath string

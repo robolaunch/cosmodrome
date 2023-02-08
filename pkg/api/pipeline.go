@@ -10,8 +10,10 @@ type PipelineInterface interface {
 
 type PipelineAbstract struct {
 	PipelineInterface
-	Name string
-	DAG  graph.Graph[string, BuildComponent]
+	Registry       string
+	Name           string
+	PushComponents bool
+	DAG            graph.Graph[string, BuildComponent]
 }
 
 type Pipeline struct {
