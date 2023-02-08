@@ -1,6 +1,8 @@
 package api
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type BuildComponentInterface interface {
 	Build()
@@ -10,12 +12,14 @@ type BuildComponentInterface interface {
 
 type BuildComponent struct {
 	BuildComponentInterface
-	Image         string
-	BaseImage     string
-	Directory     string
-	Platforms     []string
-	Rebuild       bool
-	PushComponent bool
+	Image          string
+	BaseImage      string
+	Directory      string
+	DockerfilePath string
+	BuildArgs      []string
+	Platforms      []string
+	Rebuild        bool
+	PushComponent  bool
 }
 
 func (bc *BuildComponent) Build() {
