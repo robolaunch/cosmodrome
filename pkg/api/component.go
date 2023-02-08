@@ -20,7 +20,6 @@ type BuildComponent struct {
 	DockerfilePath          string            `yaml:"dockerfilePath"`
 	BuildArgs               map[string]string `yaml:"buildArgs"`
 	Platforms               []string          `yaml:"platforms"`
-	Rebuild                 bool              `yaml:"rebuild"`
 	PushComponent           bool              `yaml:"pushComponent"`
 }
 
