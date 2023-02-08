@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/robolaunch/cosmodrome/pkg/api"
 	"github.com/spf13/cobra"
@@ -30,22 +29,28 @@ to quickly create a Cobra application.`,
 			panic(errors.New("you cannot use export flag and view flag at the same time"))
 		}
 
-		name, err := askName()
+		pipeline, err := askPipelineConfig()
 		if err != nil {
 			panic(err)
 		}
 
-		registry, err := askRegistry()
+		buildVDI, err := askBinaryQuestion("Build VDI (y/n): ")
 		if err != nil {
 			panic(err)
 		}
 
-		pushComponents, err := askPushComponents()
-		if err != nil {
-			panic(err)
-		}
+		if buildVDI {
 
-		pipeline := api.NewPipeline(name, registry, pushComponents)
+			vdiBase, err := askVDIBaseConfig(*pipeline)
+			if err != nil {
+				panic(err)
+			}
+
+			pipeline.Components = append(pipeline.Components, vdiBase)
+
+		} else {
+
+		}
 
 		if view {
 
@@ -74,61 +79,50 @@ func init() {
 	// and all subcommands, e.g.:
 	// pipelineCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-
 	pipelineCmd.Flags().BoolP("export", "e", false, "Export pipeline configuration to a YAML file.")
 	pipelineCmd.Flags().BoolP("view", "v", false, "View pipeline configuration.")
 }
 
-func askName() (string, error) {
-	var name string
-
-	fmt.Print("Enter pipeline name (eg. sunday): ")
-	_, err := fmt.Scanln(&name)
+func askPipelineConfig() (*api.Pipeline, error) {
+	name, err := askStringQuestion("Enter pipeline name (eg. sunday): ")
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 
-	// validate
+	registry, err := askStringQuestion("Enter registry (eg. robolaunchio): ")
+	if err != nil {
+		panic(err)
+	}
 
-	return name, nil
+	pushComponents, err := askBinaryQuestion("Push components to the registry (y/n): ")
+	if err != nil {
+		panic(err)
+	}
+
+	ubuntuDistro, err := askStringQuestion("Ubuntu Distro (humble/focal): ")
+	if err != nil {
+		panic(err)
+	}
+
+	pipeline := api.NewPipeline(name, registry, pushComponents, api.UbuntuDistro(ubuntuDistro))
+
+	return pipeline, nil
 }
 
-func askRegistry() (string, error) {
-	var registry string
+func askVDIBaseConfig(p api.Pipeline) (*api.VDIBase, error) {
 
-	fmt.Print("Enter registry (eg. robolaunchio): ")
-	_, err := fmt.Scanln(&registry)
+	gpuAgnostic, err := askBinaryQuestion("GPU Agnostic (y/n): ")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	// validate
-
-	return registry, nil
-}
-
-func askPushComponents() (bool, error) {
-	var pushComponents string
-
-	fmt.Print("Push components to the registry (y/n): ")
-	_, err := fmt.Scanln(&pushComponents)
-	if err != nil {
-		return false, err
+	driverVersion := "agnostic"
+	if !gpuAgnostic {
+		driverVersion, err = askStringQuestion("NVIDIA Driver Version: ")
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	// validate
-
-	// convert
-
-	switch pushComponents {
-	case "y":
-		return true, nil
-	case "n":
-		return false, nil
-	default:
-		return false, errors.New("wrong format")
-	}
-
+	return api.NewVDIBase(gpuAgnostic, driverVersion, p.UbuntuDistro, p.PushComponents), nil
 }
