@@ -16,25 +16,34 @@ type PipelineInterface interface {
 	Export()
 }
 
+type UbuntuDistro string
+
+const (
+	UbuntuDistroFocal UbuntuDistro = "focal"
+	UbuntuDistroJammy UbuntuDistro = "jammy"
+)
+
 type PipelineAbstract struct {
 	PipelineInterface `yaml:",omitempty"`
-	Name              string           `yaml:"name"`
-	Registry          string           `yaml:"registry"`
-	PushComponents    bool             `yaml:"pushComponents"`
-	Components        []BuildComponent `yaml:"components,omitempty"`
+	Name              string                    `yaml:"name"`
+	Registry          string                    `yaml:"registry"`
+	PushComponents    bool                      `yaml:"pushComponents"`
+	UbuntuDistro      UbuntuDistro              `yaml:"ubuntuDistro"`
+	Components        []BuildComponentInterface `yaml:"components,omitempty"`
 }
 
 type Pipeline struct {
 	PipelineAbstract `yaml:"pipeline,omitempty"`
 }
 
-func NewPipeline(name string, registry string, pushComponents bool) *Pipeline {
+func NewPipeline(name string, registry string, pushComponents bool, ubuntuDistro UbuntuDistro) *Pipeline {
 	pipeline := Pipeline{}
 
 	pipeline.Name = name
 	pipeline.Registry = registry
 	pipeline.PushComponents = pushComponents
-	pipeline.Components = []BuildComponent{}
+	pipeline.UbuntuDistro = ubuntuDistro
+	pipeline.Components = []BuildComponentInterface{}
 
 	return &pipeline
 }
