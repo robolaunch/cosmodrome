@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dominikbraun/graph"
 	"gopkg.in/yaml.v2"
 )
 
@@ -19,10 +18,10 @@ type PipelineInterface interface {
 
 type PipelineAbstract struct {
 	PipelineInterface `yaml:",omitempty"`
-	Name              string                              `yaml:"name"`
-	Registry          string                              `yaml:"registry"`
-	PushComponents    bool                                `yaml:"pushComponents"`
-	DAG               graph.Graph[string, BuildComponent] `yaml:",omitempty"`
+	Name              string           `yaml:"name"`
+	Registry          string           `yaml:"registry"`
+	PushComponents    bool             `yaml:"pushComponents"`
+	Components        []BuildComponent `yaml:"components,omitempty"`
 }
 
 type Pipeline struct {
@@ -35,6 +34,7 @@ func NewPipeline(name string, registry string, pushComponents bool) *Pipeline {
 	pipeline.Name = name
 	pipeline.Registry = registry
 	pipeline.PushComponents = pushComponents
+	pipeline.Components = []BuildComponent{}
 
 	return &pipeline
 }
