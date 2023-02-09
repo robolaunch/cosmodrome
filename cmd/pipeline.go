@@ -59,6 +59,17 @@ to quickly create a Cobra application.`,
 
 		}
 
+		multipleROSDistro, err := askBinaryQuestion("Multiple ROS Distro (y/n): ")
+		if err != nil {
+			panic(err)
+		}
+
+		if multipleROSDistro {
+			// ask two distro
+		} else {
+			// ask one distro
+		}
+
 		if view {
 
 			err = pipeline.View()
