@@ -483,75 +483,93 @@ function docker_build_vdi(){
     docker build ./vdi/$UBUNTU_DESKTOP -t $VDI_IMAGE \
     --build-arg BASE_IMAGE=$DRIVER_IMAGE
 
+    docker tag $VDI_IMAGE $VDI_IMAGE-amd64
     docker_push_image $VDI_IMAGE
+    docker_push_image $VDI_IMAGE-amd64
 }
 
 function docker_build_ros(){
     set -e
 
+    docker buildx rm multiarch_builder || true
+    docker buildx create --name multiarch_builder --use
+
     if [ "$MULTIPLE_ROS_DISTRO" == "true" ]; then
 
         SUB_ROS_IMAGE=sub-ros:$ROS_DISTRO_1
-
-        docker build ./ros/$ROS_DISTRO_1 -t $SUB_ROS_IMAGE \
-                --build-arg BASE_IMAGE=$ROS_BASE_IMAGE
         
-        docker build ./ros/$ROS_DISTRO_2 -t $ROS_IMAGE \
-            --build-arg BASE_IMAGE=$SUB_ROS_IMAGE
+        docker buildx build ./ros/$ROS_DISTRO_1 -t $SUB_ROS_IMAGE \
+            --build-arg BASE_IMAGE=$ROS_BASE_IMAGE \
+            --platform linux/amd64,linux/arm64 \
+            --push
+        
+        docker buildx build ./ros/$ROS_DISTRO_2 -t $ROS_IMAGE \
+            --build-arg BASE_IMAGE=$SUB_ROS_IMAGE \
+            --platform linux/amd64,linux/arm64 \
+            --push
         
     else
 
-        docker build ./ros/$ROS_DISTRO -t $ROS_IMAGE \
-            --build-arg BASE_IMAGE=$ROS_BASE_IMAGE
+        docker buildx build ./ros/$ROS_DISTRO -t $ROS_IMAGE \
+            --build-arg BASE_IMAGE=$ROS_BASE_IMAGE \
+            --platform linux/amd64,linux/arm64 \
+            --push
        
     fi
 
-    docker_push_image $ROS_IMAGE
 }
 
 function docker_build_robolaunch_robot(){
     set -e
 
+    docker buildx rm multiarch_builder || true
+    docker buildx create --name multiarch_builder --use
+
     if [ "$MULTIPLE_ROS_DISTRO" == "true" ]; then
 
-        docker build ./robot -t $ROBOLAUNCH_ROBOT_IMAGE \
+        docker buildx build ./robot -t $ROBOLAUNCH_ROBOT_IMAGE \
         --build-arg BASE_IMAGE=$ROBOLAUNCH_ROBOT_BASE_IMAGE \
         --build-arg BRIDGE_DISTRO_1=$ROS_DISTRO_1 \
-        --build-arg BRIDGE_DISTRO_2=$ROS_DISTRO_2
+        --build-arg BRIDGE_DISTRO_2=$ROS_DISTRO_2 \
+        --platform linux/amd64,linux/arm64 \
+        --push
 
     else
 
-        docker build ./robot -t $ROBOLAUNCH_ROBOT_IMAGE \
+        docker buildx build ./robot -t $ROBOLAUNCH_ROBOT_IMAGE \
         --build-arg BASE_IMAGE=$ROBOLAUNCH_ROBOT_BASE_IMAGE \
         --build-arg BRIDGE_DISTRO_1=$ROS_DISTRO \
-        --build-arg BRIDGE_DISTRO_2=$ROS_DISTRO
+        --build-arg BRIDGE_DISTRO_2=$ROS_DISTRO \
+        --platform linux/amd64,linux/arm64 \
+        --push
 
     fi
     
-    docker_push_image $ROBOLAUNCH_ROBOT_IMAGE
-
 }
 
 function docker_build_robot(){
     set -e
 
+    docker buildx rm multiarch_builder || true
+    docker buildx create --name multiarch_builder --use
+
     if [ "$MULTIPLE_ROS_DISTRO" == "true" ]; then
 
-        docker build ./robot/$ROBOT_NAME -t $ROBOT_IMAGE \
+        docker buildx build ./robot/$ROBOT_NAME -t $ROBOT_IMAGE \
         --build-arg BASE_IMAGE=$ROBOT_BASE_IMAGE \
-        --build-arg ROS_DISTRO=$ROBOT_DISTRO
+        --build-arg ROS_DISTRO=$ROBOT_DISTRO \
+        --platform linux/amd64,linux/arm64 \
+        --push
 
     else
 
-        docker build ./robot/$ROBOT_NAME -t $ROBOT_IMAGE \
+        docker buildx build ./robot/$ROBOT_NAME -t $ROBOT_IMAGE \
         --build-arg BASE_IMAGE=$ROBOT_BASE_IMAGE \
-        --build-arg ROS_DISTRO=$ROS_DISTRO
+        --build-arg ROS_DISTRO=$ROS_DISTRO \
+        --platform linux/amd64,linux/arm64 \
+        --push
 
     fi
-
-        docker_push_image $ROBOT_IMAGE
-
-
     
 }
 
