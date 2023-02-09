@@ -39,16 +39,23 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 
+		vdiBase := &api.VDIBase{}
+		vdiDesktop := &api.VDIDesktop{}
+
 		if buildVDI {
 
-			vdiBase, err := askVDIBaseConfig(*pipeline)
+			vdiBase, err = askVDIBaseConfig(*pipeline)
+			if err != nil {
+				panic(err)
+			}
+
+			vdiDesktop, err = askVDIDesktopConfig(*pipeline, *vdiBase)
 			if err != nil {
 				panic(err)
 			}
 
 			pipeline.Components = append(pipeline.Components, vdiBase)
-
-		} else {
+			pipeline.Components = append(pipeline.Components, vdiDesktop)
 
 		}
 
@@ -125,4 +132,14 @@ func askVDIBaseConfig(p api.Pipeline) (*api.VDIBase, error) {
 	}
 
 	return api.NewVDIBase(gpuAgnostic, driverVersion, p.UbuntuDistro, p.PushComponents), nil
+}
+
+func askVDIDesktopConfig(p api.Pipeline, vdiBase api.VDIBase) (*api.VDIDesktop, error) {
+
+	ubuntuDesktop, err := askStringQuestion("Ubuntu Desktop: ")
+	if err != nil {
+		return nil, err
+	}
+
+	return api.NewVDIDesktop(ubuntuDesktop, vdiBase.NvidiaDriverVersion, p.UbuntuDistro, vdiBase.GetImage(p.Registry), p.PushComponents), nil
 }

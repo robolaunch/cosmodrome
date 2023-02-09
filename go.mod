@@ -3,9 +3,9 @@ module github.com/robolaunch/cosmodrome
 go 1.19
 
 require (
-	github.com/dominikbraun/graph v0.15.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
+	gopkg.in/yaml.v2 v2.2.2
 )
 
 require (

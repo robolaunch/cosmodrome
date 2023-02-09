@@ -8,6 +8,7 @@ type BuildComponentInterface interface {
 	Build()
 	Push()
 	View()
+	GetImage(registry string) string
 }
 
 type BuildComponent struct {
@@ -33,4 +34,8 @@ func (bc *BuildComponent) Push() {
 
 func (bc *BuildComponent) View() {
 	fmt.Println(bc.Image, "Component is viewed.")
+}
+
+func (bc *BuildComponent) GetImage(registry string) string {
+	return registry + "/" + bc.Image + ":" + bc.Tag
 }
