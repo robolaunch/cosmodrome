@@ -151,7 +151,13 @@ RUN set -eux; \
     mkdir -p /var/www /var/log/neko; \
     # clean up
     apt-get clean -y; \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/* /etc/apt/sources.list.d/focal-sources.list
+
+#
+#
+# setup pulseaudio
+RUN mkdir -p /root/.config/pulse/; \
+    echo "default-server=unix:/tmp/pulseaudio.socket" > /root/.config/pulse/client.conf; \
 
 #
 # copy config files
