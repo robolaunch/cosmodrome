@@ -4,6 +4,7 @@ ARG BASE_IMAGE=nvidia/opengl:1.2-glvnd-runtime-ubuntu20.04
 # STAGE 1: SERVER
 #
 FROM ubuntu:focal as server
+
 WORKDIR /root
 
 RUN set -eux; apt-get update; apt-get install -y curl; \
@@ -15,11 +16,27 @@ WORKDIR /src
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ UTC
 
+COPY ./focal-sources.list /etc/apt/sources.list.d/
+
 #
 # install dependencies
 RUN set -eux; apt-get update; \
     apt-get install -y --no-install-recommends build-essential git cmake make libx11-dev libxrandr-dev libxtst-dev \
-    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly; \
+    libgstreamer-plugins-bad1.0=1.16.3-0ubuntu1 \
+    libgstreamer-plugins-good1.0=1.16.3-0ubuntu1.1 \
+    libgstreamer-opencv1.0=1.16.3-0ubuntu1 \
+    gir1.2-gst-plugins-bad-1.0=1.16.3-0ubuntu1 \
+    libgstreamer1.0-dev=1.16.3-0ubuntu1.1 \
+    libgstreamer-plugins-base1.0=1.16.3-0ubuntu1.1 \
+    libgstreamer-gl1.0=1.16.3-0ubuntu1.1 \
+    gir1.2-gst-plugins-base-1.0=1.16.3-0ubuntu1.1 \
+    libgstreamer1.0=1.16.3-0ubuntu1.1 \
+    gir1.2-gstreamer-1.0=1.16.3-0ubuntu1.1 \
+    libgstreamer-plugins-base1.0-dev=1.16.3-0ubuntu1.1 \
+    gstreamer1.0-plugins-base=1.16.3-0ubuntu1.1 \
+    gstreamer1.0-plugins-good=1.16.3-0ubuntu1.1 \
+    gstreamer1.0-plugins-bad=1.16.3-0ubuntu1 \
+    gstreamer1.0-plugins-ugly=1.16.2-2build1; \
     #
     # install libclipboard
     set -eux; \
@@ -98,24 +115,35 @@ ENV VIDEO_PORT DFP
 # avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
+COPY ./focal-sources.list /etc/apt/sources.list.d/
+
 RUN set -eux; \
-    #
-    # add non-free repo for intel drivers
-    #echo deb http://deb.debian.org/debian bullseye main contrib non-free > /etc/apt/sources.list; \
-    #echo deb http://deb.debian.org/debian-security/ bullseye-security main contrib non-free >> /etc/apt/sources.list; \
-    #echo deb http://deb.debian.org/debian bullseye-updates main contrib non-free >> /etc/apt/sources.list; \
     apt-get update; \
     #
     # install dependencies
     apt-get install -y --no-install-recommends nano kmod curl wget ca-certificates supervisor sudo; \
     apt-get install -y --no-install-recommends openssh-server pulseaudio dbus-x11; \
     apt-get install -y --no-install-recommends libcairo2 libxcb1 libxrandr2 libxv1 libopus0; \ 
-    # libvpx6;
     #
-    # gst + vaapi plugin
-    apt-get install -y --no-install-recommends libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-                    gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-pulseaudio \
-                    gstreamer1.0-vaapi ;\
+    # gst plugins
+    apt-get install -y --no-install-recommends --allow-downgrades --no-upgrade \
+        gstreamer1.0-pulseaudio=1.16.3-0ubuntu1.1 \
+        libgstreamer-plugins-bad1.0=1.16.3-0ubuntu1 \
+        libgstreamer-plugins-good1.0=1.16.3-0ubuntu1.1 \
+        libgstreamer-opencv1.0=1.16.3-0ubuntu1 \
+        gir1.2-gst-plugins-bad-1.0=1.16.3-0ubuntu1 \
+        libgstreamer1.0-dev=1.16.3-0ubuntu1.1 \
+        libgstreamer-plugins-base1.0=1.16.3-0ubuntu1.1 \
+        libgstreamer-gl1.0=1.16.3-0ubuntu1.1 \
+        gir1.2-gst-plugins-base-1.0=1.16.3-0ubuntu1.1 \
+        libgstreamer1.0=1.16.3-0ubuntu1.1 \
+        gir1.2-gstreamer-1.0=1.16.3-0ubuntu1.1 \
+        libgstreamer-plugins-base1.0-dev=1.16.3-0ubuntu1.1 \
+        gstreamer1.0-plugins-base=1.16.3-0ubuntu1.1 \
+        gstreamer1.0-plugins-good=1.16.3-0ubuntu1.1 \
+        gstreamer1.0-plugins-bad=1.16.3-0ubuntu1 \
+        gstreamer1.0-plugins-ugly=1.16.2-2build1; \
+
     #
     # fonts
     apt-get install -y --no-install-recommends fonts-takao-mincho fonts-wqy-zenhei; \
