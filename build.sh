@@ -178,7 +178,7 @@ function ask_ubuntu_distro(){
 
      if [ "$UBUNTU_DISTRO" == "jammy" ]; then
 
-        OPENGL_IMAGE="robolaunchio/opengl:1.2-runtime-ubuntu22.04"
+        OPENGL_IMAGE="robolaunchio/opengl:1.4-runtime-ubuntu22.04"
 
     fi
 
