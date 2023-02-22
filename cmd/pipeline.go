@@ -105,21 +105,42 @@ func askPipelineConfig() (*api.Pipeline, error) {
 		panic(err)
 	}
 
-	var rosDistro string
+	var rosDistributions []api.ROSDistro
 
 	if multipleROSDistro {
-		// ask two distro
-	} else {
-		rosDistro, err = askCustomSelectable("ROS Distro", []string{"humble", "foxy", "galactic"})
+
+		rosDistro1, err := askCustomSelectable("First ROS Distro", getMultipleDistroList(nil))
 		if err != nil {
 			return nil, err
 		}
 
+		rosDistro2, err := askCustomSelectable("Second ROS Distro", getMultipleDistroList((*api.ROSDistro)(&rosDistro1)))
+		if err != nil {
+			return nil, err
+		}
+
+		rosDistributions = []api.ROSDistro{api.ROSDistro(rosDistro1), api.ROSDistro(rosDistro2)}
+
+	} else {
+
+		rosDistro, err := askCustomSelectable("ROS Distro", []string{string(api.ROSDistroHumble), string(api.ROSDistroFoxy), string(api.ROSDistroGalactic)})
+		if err != nil {
+			return nil, err
+		}
+
+		rosDistributions = []api.ROSDistro{api.ROSDistro(rosDistro)}
 	}
 
-	ubuntuDistro, err := askCustomSelectable("Ubuntu Distro", []string{"jammy", "focal"})
-	if err != nil {
-		panic(err)
+	var ubuntuDistro api.UbuntuDistro
+	for _, v := range rosDistributions {
+		switch v {
+		case api.ROSDistroHumble:
+			ubuntuDistro = api.UbuntuDistroJammy
+		case api.ROSDistroFoxy:
+			ubuntuDistro = api.UbuntuDistroFocal
+		case api.ROSDistroGalactic:
+			ubuntuDistro = api.UbuntuDistroFocal
+		}
 	}
 
 	ubuntuDesktop, err := askCustomSelectable("Ubuntu Desktop", []string{"xfce", "mate"})
@@ -127,7 +148,22 @@ func askPipelineConfig() (*api.Pipeline, error) {
 		return nil, err
 	}
 
-	pipeline := api.NewPipeline(name, registry, []api.ROSDistro{api.ROSDistro(rosDistro)}, api.UbuntuDistro(ubuntuDistro), ubuntuDesktop)
+	pipeline := api.NewPipeline(name, registry, rosDistributions, ubuntuDistro, ubuntuDesktop)
 
 	return pipeline, nil
+}
+
+func getMultipleDistroList(distro *api.ROSDistro) []string {
+	if distro == nil {
+		return []string{string(api.ROSDistroFoxy), string(api.ROSDistroGalactic)}
+	} else {
+		switch *distro {
+		case api.ROSDistroFoxy:
+			return []string{string(api.ROSDistroGalactic)}
+		case api.ROSDistroGalactic:
+			return []string{string(api.ROSDistroFoxy)}
+		}
+	}
+
+	return []string{}
 }
