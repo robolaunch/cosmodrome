@@ -112,37 +112,18 @@ func askPipelineConfig() (*api.Pipeline, error) {
 		panic(err)
 	}
 
-	pushComponents, err := askBinaryQuestion("Push components to the registry (y/n): ")
-	if err != nil {
-		panic(err)
-	}
-
 	ubuntuDistro, err := askStringQuestion("Ubuntu Distro (humble/focal): ")
 	if err != nil {
 		panic(err)
 	}
 
-	pipeline := api.NewPipeline(name, registry, pushComponents, api.UbuntuDistro(ubuntuDistro))
+	pipeline := api.NewPipeline(name, registry, api.UbuntuDistro(ubuntuDistro))
 
 	return pipeline, nil
 }
 
 func askVDIBaseConfig(p api.Pipeline) (*api.VDIBase, error) {
-
-	gpuAgnostic, err := askBinaryQuestion("GPU Agnostic (y/n): ")
-	if err != nil {
-		return nil, err
-	}
-
-	driverVersion := "agnostic"
-	if !gpuAgnostic {
-		driverVersion, err = askStringQuestion("NVIDIA Driver Version: ")
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return api.NewVDIBase(gpuAgnostic, driverVersion, p.UbuntuDistro, p.PushComponents), nil
+	return api.NewVDIBase(p.UbuntuDistro), nil
 }
 
 func askVDIDesktopConfig(p api.Pipeline, vdiBase api.VDIBase) (*api.VDIDesktop, error) {
@@ -152,5 +133,5 @@ func askVDIDesktopConfig(p api.Pipeline, vdiBase api.VDIBase) (*api.VDIDesktop, 
 		return nil, err
 	}
 
-	return api.NewVDIDesktop(ubuntuDesktop, vdiBase.NvidiaDriverVersion, p.UbuntuDistro, vdiBase.GetImage(p.Registry), p.PushComponents), nil
+	return api.NewVDIDesktop(ubuntuDesktop, p.UbuntuDistro, vdiBase.GetImage(p.Registry)), nil
 }

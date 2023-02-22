@@ -27,7 +27,6 @@ type PipelineAbstract struct {
 	PipelineInterface `yaml:",omitempty"`
 	Name              string                    `yaml:"name"`
 	Registry          string                    `yaml:"registry"`
-	PushComponents    bool                      `yaml:"pushComponents"`
 	UbuntuDistro      UbuntuDistro              `yaml:"ubuntuDistro"`
 	Components        []BuildComponentInterface `yaml:"components,omitempty"`
 }
@@ -36,12 +35,11 @@ type Pipeline struct {
 	PipelineAbstract `yaml:"pipeline,omitempty"`
 }
 
-func NewPipeline(name string, registry string, pushComponents bool, ubuntuDistro UbuntuDistro) *Pipeline {
+func NewPipeline(name string, registry string, ubuntuDistro UbuntuDistro) *Pipeline {
 	pipeline := Pipeline{}
 
 	pipeline.Name = name
 	pipeline.Registry = registry
-	pipeline.PushComponents = pushComponents
 	pipeline.UbuntuDistro = ubuntuDistro
 	pipeline.Components = []BuildComponentInterface{}
 

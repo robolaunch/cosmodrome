@@ -21,7 +21,6 @@ type BuildComponent struct {
 	DockerfilePath          string            `yaml:"dockerfilePath"`
 	BuildArgs               map[string]string `yaml:"buildArgs"`
 	Platforms               []string          `yaml:"platforms"`
-	PushComponent           bool              `yaml:"pushComponent"`
 }
 
 func (bc *BuildComponent) Build() {
