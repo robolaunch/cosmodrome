@@ -131,19 +131,3 @@ func askPipelineConfig() (*api.Pipeline, error) {
 
 	return pipeline, nil
 }
-
-func askVDIBaseConfig(p api.Pipeline) (*api.BuildComponent, error) {
-	return api.NewVDIBase(p.UbuntuDistro), nil
-}
-
-func askVDIDesktopConfig(p api.Pipeline, vdiBase api.BuildComponent) (*api.BuildComponent, error) {
-	return api.NewVDIDesktop(p.UbuntuDesktop, p.UbuntuDistro, vdiBase.GetImage(p.Registry)), nil
-}
-
-func askROSConfig(p api.Pipeline, vdiDesktop api.BuildComponent) (*api.BuildComponent, error) {
-	return api.NewROS(p.ROSDistributions, p.UbuntuDesktop, vdiDesktop.GetImage(p.Registry)), nil
-}
-
-func askRobotBaseConfig(p api.Pipeline, ros api.BuildComponent) (*api.BuildComponent, error) {
-	return api.NewRobotBase(p.ROSDistributions, p.UbuntuDesktop, ros.GetImage(p.Registry)), nil
-}
