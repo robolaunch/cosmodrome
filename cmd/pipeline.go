@@ -59,16 +59,11 @@ to quickly create a Cobra application.`,
 
 		}
 
-		multipleROSDistro, err := askBinaryQuestion("Multiple ROS Distro (y/n): ")
+		ros, err := askROSConfig(*pipeline, *vdiBase, *vdiDesktop)
 		if err != nil {
 			panic(err)
 		}
-
-		if multipleROSDistro {
-			// ask two distro
-		} else {
-			// ask one distro
-		}
+		pipeline.Components = append(pipeline.Components, ros)
 
 		if view {
 
@@ -134,4 +129,26 @@ func askVDIDesktopConfig(p api.Pipeline, vdiBase api.VDIBase) (*api.VDIDesktop, 
 	}
 
 	return api.NewVDIDesktop(ubuntuDesktop, p.UbuntuDistro, vdiBase.GetImage(p.Registry)), nil
+}
+
+func askROSConfig(p api.Pipeline, vdiBase api.VDIBase, vdiDesktop api.VDIDesktop) (*api.ROS, error) {
+
+	multipleROSDistro, err := askBinaryQuestion("Multiple ROS Distro")
+	if err != nil {
+		panic(err)
+	}
+
+	var rosDistro string
+
+	if multipleROSDistro {
+		// ask two distro
+	} else {
+		rosDistro, err = askCustomSelectable("ROS Distro", []string{"humble", "foxy", "galactic"})
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	return api.NewROS([]string{rosDistro}, vdiDesktop.UbuntuDesktop, vdiDesktop.GetImage(p.Registry)), nil
 }
