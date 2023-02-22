@@ -34,7 +34,7 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 
-		buildVDI, err := askBinaryQuestion("Build VDI (y/n): ")
+		buildVDI, err := askBinaryQuestion("Build VDI")
 		if err != nil {
 			panic(err)
 		}
@@ -102,17 +102,17 @@ func init() {
 }
 
 func askPipelineConfig() (*api.Pipeline, error) {
-	name, err := askStringQuestion("Enter pipeline name (eg. sunday): ")
+	name, err := askStringQuestion("Enter pipeline name (eg. sunday)")
 	if err != nil {
 		panic(err)
 	}
 
-	registry, err := askStringQuestion("Enter registry (eg. robolaunchio): ")
+	registry, err := askStringQuestion("Enter registry (eg. robolaunchio)")
 	if err != nil {
 		panic(err)
 	}
 
-	ubuntuDistro, err := askStringQuestion("Ubuntu Distro (humble/focal): ")
+	ubuntuDistro, err := askCustomSelectable("Ubuntu Distro", []string{"jammy", "focal"})
 	if err != nil {
 		panic(err)
 	}
@@ -128,7 +128,7 @@ func askVDIBaseConfig(p api.Pipeline) (*api.VDIBase, error) {
 
 func askVDIDesktopConfig(p api.Pipeline, vdiBase api.VDIBase) (*api.VDIDesktop, error) {
 
-	ubuntuDesktop, err := askStringQuestion("Ubuntu Desktop: ")
+	ubuntuDesktop, err := askCustomSelectable("Ubuntu Desktop", []string{"xfce", "mate"})
 	if err != nil {
 		return nil, err
 	}
