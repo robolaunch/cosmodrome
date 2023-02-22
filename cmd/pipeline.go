@@ -39,37 +39,24 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 
-		vdiBase := &api.VDIBase{}
-		vdiDesktop := &api.VDIDesktop{}
+		vdiBase := &api.BuildComponent{}
+		vdiDesktop := &api.BuildComponent{}
 
 		if buildVDI {
 
-			vdiBase, err = askVDIBaseConfig(*pipeline)
-			if err != nil {
-				panic(err)
-			}
+			vdiBase = api.NewVDIBase(pipeline.UbuntuDistro)
+			vdiDesktop = api.NewVDIDesktop(pipeline.UbuntuDesktop, pipeline.UbuntuDistro, vdiBase.GetImage(pipeline.Registry))
 
-			vdiDesktop, err = askVDIDesktopConfig(*pipeline, *vdiBase)
-			if err != nil {
-				panic(err)
-			}
-
-			pipeline.Components = append(pipeline.Components, vdiBase)
-			pipeline.Components = append(pipeline.Components, vdiDesktop)
+			pipeline.Components = append(pipeline.Components, *vdiBase)
+			pipeline.Components = append(pipeline.Components, *vdiDesktop)
 
 		}
 
-		ros, err := askROSConfig(*pipeline, *vdiBase, *vdiDesktop)
-		if err != nil {
-			panic(err)
-		}
-		pipeline.Components = append(pipeline.Components, ros)
+		ros := api.NewROS(pipeline.ROSDistributions, pipeline.UbuntuDesktop, vdiDesktop.GetImage(pipeline.Registry))
+		pipeline.Components = append(pipeline.Components, *ros)
 
-		robotBase, err := askRobotBaseConfig(*pipeline, *vdiBase, *vdiDesktop, *ros)
-		if err != nil {
-			panic(err)
-		}
-		pipeline.Components = append(pipeline.Components, robotBase)
+		robotBase := api.NewRobotBase(pipeline.ROSDistributions, pipeline.UbuntuDesktop, ros.GetImage(pipeline.Registry))
+		pipeline.Components = append(pipeline.Components, *robotBase)
 
 		if view {
 
@@ -113,32 +100,6 @@ func askPipelineConfig() (*api.Pipeline, error) {
 		panic(err)
 	}
 
-	ubuntuDistro, err := askCustomSelectable("Ubuntu Distro", []string{"jammy", "focal"})
-	if err != nil {
-		panic(err)
-	}
-
-	pipeline := api.NewPipeline(name, registry, api.UbuntuDistro(ubuntuDistro))
-
-	return pipeline, nil
-}
-
-func askVDIBaseConfig(p api.Pipeline) (*api.VDIBase, error) {
-	return api.NewVDIBase(p.UbuntuDistro), nil
-}
-
-func askVDIDesktopConfig(p api.Pipeline, vdiBase api.VDIBase) (*api.VDIDesktop, error) {
-
-	ubuntuDesktop, err := askCustomSelectable("Ubuntu Desktop", []string{"xfce", "mate"})
-	if err != nil {
-		return nil, err
-	}
-
-	return api.NewVDIDesktop(ubuntuDesktop, p.UbuntuDistro, vdiBase.GetImage(p.Registry)), nil
-}
-
-func askROSConfig(p api.Pipeline, vdiBase api.VDIBase, vdiDesktop api.VDIDesktop) (*api.ROS, error) {
-
 	multipleROSDistro, err := askBinaryQuestion("Multiple ROS Distro")
 	if err != nil {
 		panic(err)
@@ -156,9 +117,33 @@ func askROSConfig(p api.Pipeline, vdiBase api.VDIBase, vdiDesktop api.VDIDesktop
 
 	}
 
-	return api.NewROS([]string{rosDistro}, vdiDesktop.UbuntuDesktop, vdiDesktop.GetImage(p.Registry)), nil
+	ubuntuDistro, err := askCustomSelectable("Ubuntu Distro", []string{"jammy", "focal"})
+	if err != nil {
+		panic(err)
+	}
+
+	ubuntuDesktop, err := askCustomSelectable("Ubuntu Desktop", []string{"xfce", "mate"})
+	if err != nil {
+		return nil, err
+	}
+
+	pipeline := api.NewPipeline(name, registry, []api.ROSDistro{api.ROSDistro(rosDistro)}, api.UbuntuDistro(ubuntuDistro), ubuntuDesktop)
+
+	return pipeline, nil
 }
 
-func askRobotBaseConfig(p api.Pipeline, vdiBase api.VDIBase, vdiDesktop api.VDIDesktop, ros api.ROS) (*api.RobotBase, error) {
-	return api.NewRobotBase(ros.ROSDistributions, vdiDesktop.UbuntuDesktop, ros.GetImage(p.Registry)), nil
+func askVDIBaseConfig(p api.Pipeline) (*api.BuildComponent, error) {
+	return api.NewVDIBase(p.UbuntuDistro), nil
+}
+
+func askVDIDesktopConfig(p api.Pipeline, vdiBase api.BuildComponent) (*api.BuildComponent, error) {
+	return api.NewVDIDesktop(p.UbuntuDesktop, p.UbuntuDistro, vdiBase.GetImage(p.Registry)), nil
+}
+
+func askROSConfig(p api.Pipeline, vdiDesktop api.BuildComponent) (*api.BuildComponent, error) {
+	return api.NewROS(p.ROSDistributions, p.UbuntuDesktop, vdiDesktop.GetImage(p.Registry)), nil
+}
+
+func askRobotBaseConfig(p api.Pipeline, ros api.BuildComponent) (*api.BuildComponent, error) {
+	return api.NewRobotBase(p.ROSDistributions, p.UbuntuDesktop, ros.GetImage(p.Registry)), nil
 }
