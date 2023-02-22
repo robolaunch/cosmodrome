@@ -65,6 +65,12 @@ to quickly create a Cobra application.`,
 		}
 		pipeline.Components = append(pipeline.Components, ros)
 
+		robotBase, err := askRobotBaseConfig(*pipeline, *vdiBase, *vdiDesktop, *ros)
+		if err != nil {
+			panic(err)
+		}
+		pipeline.Components = append(pipeline.Components, robotBase)
+
 		if view {
 
 			err = pipeline.View()
@@ -151,4 +157,8 @@ func askROSConfig(p api.Pipeline, vdiBase api.VDIBase, vdiDesktop api.VDIDesktop
 	}
 
 	return api.NewROS([]string{rosDistro}, vdiDesktop.UbuntuDesktop, vdiDesktop.GetImage(p.Registry)), nil
+}
+
+func askRobotBaseConfig(p api.Pipeline, vdiBase api.VDIBase, vdiDesktop api.VDIDesktop, ros api.ROS) (*api.RobotBase, error) {
+	return api.NewRobotBase(ros.ROSDistributions, vdiDesktop.UbuntuDesktop, ros.GetImage(p.Registry)), nil
 }
