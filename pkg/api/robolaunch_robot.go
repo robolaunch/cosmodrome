@@ -10,7 +10,7 @@ func NewRobotBase(rosDistributions []ROSDistro, ubuntuDesktop string, rosImage s
 			"BRIDGE_DISTRO_1": string(rosDistributions[0]),
 			"BRIDGE_DISTRO_2": string(rosDistributions[0]),
 		}
-	} else if len(rosDistributions) == 1 {
+	} else if len(rosDistributions) == 2 {
 		distroStr = string(rosDistributions[0]) + "-" + string(rosDistributions[1])
 		robotBase.BuildArgs = map[string]string{
 			"BRIDGE_DISTRO_1": string(rosDistributions[0]),

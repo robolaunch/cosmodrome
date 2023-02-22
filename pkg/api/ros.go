@@ -6,7 +6,7 @@ func NewROS(rosDistributions []ROSDistro, ubuntuDesktop string, vdiDesktopImage 
 	distroStr := ""
 	if len(rosDistributions) == 1 {
 		distroStr = string(string(rosDistributions[0]))
-	} else if len(rosDistributions) == 1 {
+	} else if len(rosDistributions) == 2 {
 		distroStr = string(string(rosDistributions[0])) + "-" + string(string(rosDistributions[1]))
 	}
 
