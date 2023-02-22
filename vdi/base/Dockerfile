@@ -157,7 +157,7 @@ RUN set -eux; \
 #
 # setup pulseaudio
 RUN mkdir -p /root/.config/pulse/; \
-    echo "default-server=unix:/tmp/pulseaudio.socket" > /root/.config/pulse/client.conf; \
+    echo "default-server=unix:/tmp/pulseaudio.socket" > /root/.config/pulse/client.conf;
 
 #
 # copy config files
