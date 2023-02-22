@@ -1,10 +1,10 @@
 ARG BASE_IMAGE="ros:foxy-ros-base-focal"
 
-FROM golang:1.17 as cli-builder
-WORKDIR /go/src
-RUN git clone https://bitbucket.org/kaesystems/rlros2 -b main
-WORKDIR /go/src/rlros2
-RUN make
+# FROM golang:1.17 as cli-builder
+# WORKDIR /go/src
+# RUN git clone https://bitbucket.org/kaesystems/rlros2 -b main
+# WORKDIR /go/src/rlros2
+# RUN make
 
 FROM ${BASE_IMAGE}
 ARG BRIDGE_DISTRO_1="foxy"
@@ -22,8 +22,8 @@ RUN apt update && apt install -y \
 
 # cloud ide & extensions
 RUN curl -fsSL https://code-server.dev/install.sh | sh
-COPY --from=cli-builder /go/src/rlros2/hack/ros2_cli_override.sh /etc/
-COPY --from=cli-builder /go/src/rlros2/rlros2 /usr/bin/
+# COPY --from=cli-builder /go/src/rlros2/hack/ros2_cli_override.sh /etc/
+# COPY --from=cli-builder /go/src/rlros2/rlros2 /usr/bin/
 
 # RUN mkdir -p ~/.local/share/code-server/extensions
 # WORKDIR /root/.local/share/code-server/extensions
