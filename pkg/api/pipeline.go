@@ -23,25 +23,40 @@ const (
 	UbuntuDistroJammy UbuntuDistro = "jammy"
 )
 
-type PipelineAbstract struct {
-	PipelineInterface `yaml:",omitempty"`
-	Name              string                    `yaml:"name"`
-	Registry          string                    `yaml:"registry"`
-	UbuntuDistro      UbuntuDistro              `yaml:"ubuntuDistro"`
-	Components        []BuildComponentInterface `yaml:"components,omitempty"`
-}
+type ROSDistro string
+
+const (
+	ROSDistroHumble   ROSDistro = "humble"
+	ROSDistroFoxy     ROSDistro = "foxy"
+	ROSDistroGalactic ROSDistro = "galactic"
+)
+
+// type Components struct {
+// 	VDIBase    VDIBase    `mapstructure:"vdiBase,omitempty"`
+// 	VDIDesktop VDIDesktop `mapstructure:"vdiDesktop,omitempty"`
+// 	ROS        ROS        `mapstructure:"ros,omitempty"`
+// 	RobotBase  RobotBase  `mapstructure:"robotBase,omitempty"`
+// }
 
 type Pipeline struct {
-	PipelineAbstract `yaml:"pipeline,omitempty"`
+	PipelineInterface `json:"-"`
+	Name              string           `mapstructure:"name"`
+	Registry          string           `mapstructure:"registry"`
+	UbuntuDistro      UbuntuDistro     `mapstructure:"ubuntuDistro"`
+	ROSDistributions  []ROSDistro      `mapstructure:"rosDistributions"`
+	UbuntuDesktop     string           `mapstructure:"ubuntuDesktop"`
+	Components        []BuildComponent `mapstructure:"components"`
 }
 
-func NewPipeline(name string, registry string, ubuntuDistro UbuntuDistro) *Pipeline {
+func NewPipeline(name string, registry string, rosDistributions []ROSDistro, ubuntuDistro UbuntuDistro, ubuntuDesktop string) *Pipeline {
 	pipeline := Pipeline{}
 
 	pipeline.Name = name
 	pipeline.Registry = registry
 	pipeline.UbuntuDistro = ubuntuDistro
-	pipeline.Components = []BuildComponentInterface{}
+	pipeline.ROSDistributions = rosDistributions
+	pipeline.UbuntuDesktop = ubuntuDesktop
+	pipeline.Components = []BuildComponent{}
 
 	return &pipeline
 }

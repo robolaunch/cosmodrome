@@ -12,15 +12,15 @@ type BuildComponentInterface interface {
 }
 
 type BuildComponent struct {
-	BuildComponentInterface `yaml:",omitempty"`
-	Name                    string            `yaml:"name"`
-	Image                   string            `yaml:"image"`
-	Tag                     string            `yaml:"tag"`
-	BaseImage               string            `yaml:"baseImage"`
-	Directory               string            `yaml:"directory"`
-	DockerfilePath          string            `yaml:"dockerfilePath"`
-	BuildArgs               map[string]string `yaml:"buildArgs"`
-	Platforms               []string          `yaml:"platforms"`
+	BuildComponentInterface
+	Name           string            `mapstructure:"name"`
+	Image          string            `mapstructure:"image"`
+	Tag            string            `mapstructure:"tag"`
+	BaseImage      string            `mapstructure:"baseImage"`
+	Directory      string            `mapstructure:"directory"`
+	DockerfilePath string            `mapstructure:"dockerfilePath"`
+	BuildArgs      map[string]string `mapstructure:"buildArgs"`
+	Platforms      []string          `mapstructure:"platforms"`
 }
 
 func (bc *BuildComponent) Build() {
