@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/robolaunch/trademark/main/logos/svg/rocket.svg" width="40" height="40" align="top"> Robot Image Pipeline
+# <img src="https://raw.githubusercontent.com/robolaunch/trademark/main/logos/svg/rocket.svg" width="40" height="40" align="top"> **cosmodrome** - Image Pipeline
 
 <div align="center">
   <p align="center">
@@ -11,7 +11,7 @@
   </p>
 </div>
 
-Robot image pipeline produces images for [robolaunch Robot Operator](https://github.com/robolaunch/robot-operator).
+**cosmodrome** is an image pipeline that produces images for [robolaunch Robot Operator](https://github.com/robolaunch/robot-operator).
 
 ## Table of Contents
 
@@ -43,7 +43,7 @@ See all images from [robolaunch's Docker Hub](https://hub.docker.com/u/robolaunc
 Clone the artifacts repository.
 
 ```bash
-git clone https://github.com/robolaunch/robot-image-pipeline
+git clone https://github.com/robolaunch/cosmodrome
 ```
 
 #### Prerequisites
