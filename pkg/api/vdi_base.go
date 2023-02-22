@@ -12,7 +12,11 @@ func NewVDIBase(ubuntuDistro UbuntuDistro) *VDIBase {
 	vdiBase.BuildComponent.Name = "vdi-base"
 	vdiBase.BuildComponent.Image = "driver"
 	vdiBase.BuildComponent.Tag = string(ubuntuDistro) + "-agnostic"
-	vdiBase.BuildComponent.BaseImage = "OPENGL-IMAGE"
+	if ubuntuDistro == UbuntuDistroJammy {
+		vdiBase.BuildComponent.BaseImage = "robolaunchio/opengl:1.4-runtime-ubuntu22.04"
+	} else if ubuntuDistro == UbuntuDistroFocal {
+		vdiBase.BuildComponent.BaseImage = "nvidia/opengl:1.2-glvnd-runtime-ubuntu20.04"
+	}
 	vdiBase.BuildComponent.Directory = "images/vdi/base"
 	vdiBase.BuildComponent.DockerfilePath = "images/vdi/base/Dockerfile"
 	vdiBase.BuildComponent.BuildArgs = map[string]string{
