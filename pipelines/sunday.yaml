@@ -1,0 +1,54 @@
+pipelineinterface: null
+name: sunday
+registry: robolaunchio
+ubuntudistro: jammy
+rosdistributions:
+- humble
+ubuntudesktop: xfce
+components:
+- buildcomponentinterface: null
+  name: vdi-base
+  image: driver
+  tag: jammy-agnostic
+  baseimage: robolaunchio/opengl:1.4-runtime-ubuntu22.04
+  directory: images/vdi/base
+  dockerfilepath: images/vdi/base/Dockerfile
+  buildargs:
+    GPU_AGNOSTIC: "true"
+    NVIDIA_DRIVER_VERSION: agnostic
+  platforms:
+  - amd64
+- buildcomponentinterface: null
+  name: vdi-desktop
+  image: vdi
+  tag: jammy-agnostic-xfce
+  baseimage: robolaunchio/driver:jammy-agnostic
+  directory: images/vdi/xfce
+  dockerfilepath: images/vdi/xfce/Dockerfile
+  buildargs: {}
+  platforms:
+  - amd64
+- buildcomponentinterface: null
+  name: ros
+  image: humble
+  tag: agnostic-xfce
+  baseimage: robolaunchio/vdi:jammy-agnostic-xfce
+  directory: images/ros/humble
+  dockerfilepath: images/ros/humble/Dockerfile
+  buildargs: {}
+  platforms:
+  - amd64
+  - arm64
+- buildcomponentinterface: null
+  name: robot-base
+  image: robot
+  tag: base-humble-agnostic-xfce
+  baseimage: robolaunchio/humble:agnostic-xfce
+  directory: images/robot
+  dockerfilepath: images/robot/Dockerfile
+  buildargs:
+    BRIDGE_DISTRO_1: humble
+    BRIDGE_DISTRO_2: humble
+  platforms:
+  - amd64
+  - arm64
