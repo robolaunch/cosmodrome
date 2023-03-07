@@ -27,7 +27,12 @@ to quickly create a Cobra application.`,
 		config := &api.Pipeline{}
 
 		viper.Unmarshal(config)
-		config.View()
+		// config.View()
+
+		for _, component := range config.Components {
+			component.Build()
+			component.Push()
+		}
 	},
 }
 

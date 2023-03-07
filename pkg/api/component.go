@@ -24,15 +24,17 @@ type BuildComponent struct {
 }
 
 func (bc *BuildComponent) Build() {
-	fmt.Println(bc.Image, "Component is built.")
+
+	execBashCmd("")
+
 }
 
 func (bc *BuildComponent) Push() {
-	fmt.Println(bc.Image, "Component is pushed.")
+	fmt.Println(bc.Name, "Component is pushed.")
 }
 
 func (bc *BuildComponent) View() {
-	fmt.Println(bc.Image, "Component is viewed.")
+	fmt.Println(bc.Name, "Component is viewed.")
 }
 
 func (bc *BuildComponent) GetImage(registry string) string {
