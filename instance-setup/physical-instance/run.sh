@@ -19,7 +19,7 @@ NC='\033[0m';
 CERT_MANAGER_VERSION="v1.8.0";
 OPERATOR_SUITE_VERSION="0.1.0";
 K3S_VERSION="v1.24.10"
-TARGETARCH="amd64"
+TARGETARCH="arm64"
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
 
@@ -169,10 +169,14 @@ install_tools () {
 
 set_up_k3s () {
     print_log "Setting up k3s...";
+    curl -sfL https://get.k3s.io | \
+        INSTALL_K3S_VERSION=$K3S_VERSION+k3s1 \
+        K3S_KUBECONFIG_MODE="644" \
+        INSTALL_K3S_EXEC="  --cluster-cidr=$DESIRED_CLUSTER_CIDR --service-cidr=$DESIRED_SERVICE_CIDR    --cluster-domain=$PHYSICAL_INSTANCE.local --disable-network-policy --disable=traefik --disable=local-storage" sh -;
+    sleep 5;
 }
 
 check_cluster () {
-    print_log "Checking cluster health...";
     check_cluster_cidr;
     check_service_cidr;
 }
@@ -180,7 +184,7 @@ check_cluster () {
 label_node () {
     print_log "Labeling node...";
     check_node_name;
-    kubectl label node $NODE_NAME \
+    kubectl label --overwrite=true node $NODE_NAME \
         robolaunch.io/organization=$ORGANIZATION \
         robolaunch.io/region=$REGION \
         robolaunch.io/team=$TEAM \
@@ -255,7 +259,7 @@ join_connection_hub () {
     yq e -i ".spec.submarinerSpec.clusterCIDR = \"$PHYSICAL_INSTANCE_CLUSTER_CIDR\"" ch-pi.yaml;
     yq e -i ".spec.submarinerSpec.serviceCIDR = \"$PHYSICAL_INSTANCE_SERVICE_CIDR\"" ch-pi.yaml;
     
-    CH_INSTALL_SUCCEEDED="false"m
+    CH_INSTALL_SUCCEEDED="false"
     while [ "$CH_INSTALL_SUCCEEDED" != "true" ]
     do 
         CH_INSTALL_SUCCEEDED="true"
@@ -281,13 +285,11 @@ check_cloud_instance_phase () {
 }
 
 display_info () {
-    print_log "Physical instance is connected to the cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
     check_cluster;
     PHYSICAL_INSTANCE_API_SERVER_URL="https://"${PHYSICAL_INSTANCE_CLUSTER_CIDR%0/*}"1:6443"
     CERT_AUTHORITY_DATA=$(yq '.clusters[] | select(.name == "default") | .cluster.certificate-authority-data' $KUBECONFIG);
     CLIENT_CERTIFICATE=$(yq '.users[] | select(.name == "default") | .user.client-certificate-data' $KUBECONFIG);
     CLIENT_KEY=$(yq '.users[] | select(.name == "default") | .user.client-key-data' $KUBECONFIG);
-    print_log "In order to complete registration of physical instance you should run the command below in cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
     printf "\n\n"
     echo \
 "cat <<EOF | kubectl apply -f -
@@ -303,6 +305,8 @@ spec:
     clientKey: $CLIENT_KEY
 EOF";
     printf "\n";
+    print_log "Physical instance is connected to the cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+    print_log "In order to complete registration of physical instance you should run the command above in cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
 }
 
 opening >&3
@@ -311,11 +315,11 @@ opening >&3
 # print_global_log "Installing tools...";
 # (install_tools)
 
-# print_global_log "Setting up k3s cluster...";
-# (set_up_k3s)
+print_global_log "Setting up k3s cluster...";
+(set_up_k3s)
 
-# print_global_log "Checking cluster health...";
-# (check_cluster)
+print_global_log "Checking cluster health...";
+(check_cluster)
 
 print_global_log "Labeling node...";
 (label_node)
