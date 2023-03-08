@@ -177,6 +177,18 @@ check_cluster () {
     check_service_cidr;
 }
 
+label_node () {
+    print_log "Labeling node...";
+    check_node_name;
+    kubectl label node $NODE_NAME \
+        robolaunch.io/organization=$ORGANIZATION \
+        robolaunch.io/region=$REGION \
+        robolaunch.io/team=$TEAM \
+        robolaunch.io/cloud-instance=$CLOUD_INSTANCE \
+        robolaunch.io/cloud-instance-alias=$CLOUD_INSTANCE_ALIAS \
+        submariner.io/gateway="true";
+}
+
 update_helm_repositories () {
     print_log "Updating Helm repositories...";
     helm repo add openebs https://openebs.github.io/charts;
@@ -305,8 +317,8 @@ opening >&3
 # print_global_log "Checking cluster health...";
 # (check_cluster)
 
-# print_global_log "Labeling node...";
-# (label_node)
+print_global_log "Labeling node...";
+(label_node)
 
 print_global_log "Updating Helm repositories...";
 (update_helm_repositories)
