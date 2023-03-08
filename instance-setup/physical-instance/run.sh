@@ -270,6 +270,7 @@ check_cloud_instance_phase () {
 
 display_info () {
     print_log "Physical instance is connected to the cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+    check_cluster;
     PHYSICAL_INSTANCE_API_SERVER_URL="https://"${PHYSICAL_INSTANCE_CLUSTER_CIDR%0/*}"1:6443"
     CERT_AUTHORITY_DATA=$(yq '.clusters[] | select(.name == "default") | .cluster.certificate-authority-data' $KUBECONFIG);
     CLIENT_CERTIFICATE=$(yq '.users[] | select(.name == "default") | .user.client-certificate-data' $KUBECONFIG);
@@ -288,7 +289,8 @@ spec:
     certificateAuthority: $CERT_AUTHORITY_DATA
     clientCertificate: $CLIENT_CERTIFICATE
     clientKey: $CLIENT_KEY
-EOF"
+EOF";
+    printf "\n";
 }
 
 opening >&3
