@@ -138,6 +138,15 @@ check_inputs () {
     set_desired_service_cidr;
 }
 
+opening () {
+    apt-get update 2>/dev/null 1>/dev/null;
+    apt-get install -y figlet 2>/dev/null 1>/dev/null; 
+    figlet 'robolaunch' -f slant;
+    printf "\n";
+    echo "\"We Empower ROS/ROS2 based GPU Offloaded Robots & Geographically Distributed Fleets\"";
+    printf "\n";
+}
+
 install_tools () {
     print_log "Installing Tools...";
     # apt packages
@@ -152,15 +161,6 @@ install_tools () {
     # install yq
     wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${TARGETARCH};
     chmod a+x /usr/local/bin/yq;
-}
-
-opening () {
-    apt-get update 2>/dev/null 1>/dev/null;
-    apt-get install -y figlet 2>/dev/null 1>/dev/null; 
-    figlet 'robolaunch' -f slant;
-    printf "\n";
-    echo "\"We Empower ROS/ROS2 based GPU Offloaded Robots & Geographically Distributed Fleets\"";
-    printf "\n";
 }
 
 set_up_nvidia_container_runtime () {
@@ -190,17 +190,20 @@ check_cluster () {
     check_api_server_url;
     check_cluster_cidr;
     check_service_cidr;
+    set_public_ip
+    curl -vk --resolve $PUBLIC_IP:6443:127.0.0.1  https://$PUBLIC_IP:6443/ping;
 }
 
 label_node () {
     print_log "Labeling node...";
     check_node_name;
-    kubectl label node $NODE_NAME \
+    kubectl label --overwrite=true node $NODE_NAME \
         robolaunch.io/organization=$ORGANIZATION \
         robolaunch.io/region=$REGION \
         robolaunch.io/team=$TEAM \
         robolaunch.io/cloud-instance=$CLOUD_INSTANCE \
-        robolaunch.io/cloud-instance-alias=$CLOUD_INSTANCE_ALIAS
+        robolaunch.io/cloud-instance-alias=$CLOUD_INSTANCE_ALIAS \
+        submariner.io/gateway="true";
 }
 
 update_helm_repositories () {
@@ -313,26 +316,38 @@ display_connection_hub_key () {
 
 opening >&3
 (check_inputs)
+
 print_global_log "Installing tools...";
 (install_tools)
+
 print_global_log "Setting up NVIDIA container runtime...";
 (set_up_nvidia_container_runtime)
+
 print_global_log "Setting up k3s cluster...";
 (set_up_k3s)
+
 print_global_log "Checking cluster health...";
 (check_cluster)
+
 print_global_log "Labeling node...";
 (label_node)
+
 print_global_log "Updating Helm repositories...";
 (update_helm_repositories)
+
 print_global_log "Installing openebs...";
 (install_openebs)
+
 print_global_log "Installing NVIDIA device plugin...";
 (install_nvidia_device_plugin)
+
 print_global_log "Installing cert-manager...";
 (install_cert_manager)
+
 print_global_log "Installing robolaunch Operator Suite...";
 (install_operator_suite)
+
 print_global_log "Deploying Connection Hub...";
 (deploy_connection_hub)
+
 display_connection_hub_key >&3
