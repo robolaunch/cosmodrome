@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# prerequisites: kubectl, helm, curl, wget, yq, figlet
-
 # ORGANIZATION=rls-doo \
 # TEAM=team-cloudy \
 # REGION=eu-east-2 \
 # CLOUD_INSTANCE=robot-cloud-02 \
 # CLOUD_INSTANCE_ALIAS=instance-1 \
 # PHYSICAL_INSTANCE=robot-cloudy-01 \
-# ./physical-instance.sh
+# DESIRED_CLUSTER_CIDR=10.20.1.0/24 \
+# DESIRED_SERVICE_CIDR=10.20.2.0/24 \
+# ./run.sh
 
 set -e;
 
