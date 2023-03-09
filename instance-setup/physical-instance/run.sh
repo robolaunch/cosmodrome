@@ -23,7 +23,7 @@ TARGETARCH="arm64"
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
 
-# export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
+export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
 
 print_global_log () {
@@ -312,8 +312,8 @@ EOF";
 opening >&3
 (check_inputs)
 
-# print_global_log "Installing tools...";
-# (install_tools)
+print_global_log "Installing tools...";
+(install_tools)
 
 print_global_log "Setting up k3s cluster...";
 (set_up_k3s)
