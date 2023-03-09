@@ -275,7 +275,7 @@ join_connection_hub () {
 check_cloud_instance_phase () {
     while [ true ]
     do
-        CLOUD_INSTANCE_PHASE=$(kubectl get cloudinstances robot-cloud-02 -o jsonpath="{.status.phase}" | yq -P);
+        CLOUD_INSTANCE_PHASE=$(kubectl get cloudinstances $CLOUD_INSTANCE -o jsonpath="{.status.phase}" | yq -P);
         if [ "$CLOUD_INSTANCE_PHASE" = "Connected" ]; then
             break;
         fi
