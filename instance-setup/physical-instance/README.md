@@ -93,7 +93,7 @@ watch kubectl get physicalinstances
 If the values for the columns `MULTICAST`, `FEDERATION` and `PHASE` are all `Connected`, you have successfully register a physical instance to a cloud instance.
 ```
 NAME              GATEWAY             HOSTNAME           CLUSTER ID        SUBNETS                           MULTICAST   FEDERATION   PHASE
-robot-cloudy-01   ip-172-31-182-159   ip-172-31-28-234   robot-cloudy-01   ["10.20.2.0/24","10.20.1.0/24"]   Connected   Connected    Connected
+cloudy-agv        ip-172-31-182-159   ip-172-31-28-234   cloudy-agv        ["10.20.2.0/24","10.20.1.0/24"]   Connected   Connected    Connected
 ```
 
 ## Components
