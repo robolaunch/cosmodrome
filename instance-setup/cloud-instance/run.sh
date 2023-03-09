@@ -306,10 +306,11 @@ deploy_connection_hub () {
 }
 
 display_connection_hub_key () {
-    CONNECTION_HUB_KEY=$(kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P);
-    printf "\n\n";
-    echo $CONNECTION_HUB_KEY;
-    printf "\n";
+    # CONNECTION_HUB_KEY=$(kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P);
+    printf "\n\n"
+    printf "Get connection hub key by running the command below:\n\n";
+    printf "kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P";
+    printf "\n\n"
     print_log "You can use this key to establish a connection with cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
 }
 
