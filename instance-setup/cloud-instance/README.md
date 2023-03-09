@@ -1,4 +1,4 @@
-# Setting Up Cloud Instance (VM)
+# Setting Up Cloud Instance
 
 This is the table of contents for this document.
 
@@ -9,13 +9,14 @@ This is the table of contents for this document.
 
 ## Quick Start
 
-This document assumes you have a virtual machine (with `amd64` architecture) provisioned on any cloud provider and has Ubuntu 20.04 or 22.04 on it.
+This document assumes you have **a desktop environment** or **virtual machine** (with `amd64` architecture) on any cloud provider and has Ubuntu 20.04 or 22.04 on it.
 
 ### Running the Script
 
 Run the following command to set up cloud instance:
 
 ```bash
+# replace `run.sh` with `run_desktop.sh` if you are in a desktop environment
 ORGANIZATION=sample-org \
 TEAM=sample-team \
 REGION=sample-region \
