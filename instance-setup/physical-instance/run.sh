@@ -190,6 +190,7 @@ label_node () {
         robolaunch.io/team=$TEAM \
         robolaunch.io/cloud-instance=$CLOUD_INSTANCE \
         robolaunch.io/cloud-instance-alias=$CLOUD_INSTANCE_ALIAS \
+        robolaunch.io/physical-instance=$PHYSICAL_INSTANCE \
         submariner.io/gateway="true";
 }
 
