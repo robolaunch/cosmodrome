@@ -5,8 +5,9 @@
 # REGION=eu-east-2 \
 # CLOUD_INSTANCE=robot-cloud-02 \
 # CLOUD_INSTANCE_ALIAS=instance-1 \
-# DESIRED_CLUSTER_CIDR=10.100.1.0/24 \
-# DESIRED_SERVICE_CIDR=10.100.2.0/24 \
+# PHYSICAL_INSTANCE=robot-cloudy-01 \
+# DESIRED_CLUSTER_CIDR=10.20.1.0/24 \
+# DESIRED_SERVICE_CIDR=10.20.2.0/24 \
 # ./run.sh
 
 set -e;
@@ -17,12 +18,10 @@ NC='\033[0m';
 
 CERT_MANAGER_VERSION="v1.8.0";
 OPERATOR_SUITE_VERSION="0.1.0";
-CH_CLOUD_INSTANCE_URL="https://gist.githubusercontent.com/tunahanertekin/f041e2c3fbc6cdaadd72816c350b357c/raw/ac86a73e70ea8dce5903eed3472b26afdc255f0d/ch-ci.yaml";
 K3S_VERSION="v1.24.10"
-TARGETARCH="amd64"
+TARGETARCH="arm64"
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
-
 
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
@@ -38,6 +37,18 @@ print_log () {
 print_err () {
     echo -e "${RED}Error: $1${NC}" >&3;
     exit 1;
+}
+
+check_inputs () {
+    set_organization;
+    set_team;
+    set_region;
+    set_cloud_instance;
+    set_cloud_instance_alias;
+    set_physical_instance;
+    set_connection_hub_key;
+    set_desired_cluster_cidr;
+    set_desired_service_cidr;
 }
 
 set_cluster_root_domain () {
@@ -86,6 +97,14 @@ set_cloud_instance_alias () {
     fi
 }
 
+set_physical_instance () {
+    if [[ -z "${PHYSICAL_INSTANCE}" ]]; then
+        print_err "Environment variable PHYSICAL_INSTANCE should be set.";
+    else
+        PHYSICAL_INSTANCE=$PHYSICAL_INSTANCE;
+    fi
+}
+
 set_desired_cluster_cidr () {
     if [[ -z "${DESIRED_CLUSTER_CIDR}" ]]; then
         print_err "Environment variable DESIRED_CLUSTER_CIDR should be set.";
@@ -102,17 +121,12 @@ set_desired_service_cidr () {
     fi
 }
 
-set_public_ip () {
-    if [[ -z "${PUBLIC_IP}" ]]; then
-        PUBLIC_IP=$(curl https://ipinfo.io/ip);
+set_connection_hub_key () {
+    if [[ -z "${CONNECTION_HUB_KEY}" ]]; then
+        print_err "Environment variable CONNECTION_HUB_KEY should be set.";
     else
-        PUBLIC_IP=$PUBLIC_IP;
+        CONNECTION_HUB_KEY=$CONNECTION_HUB_KEY;
     fi
-}
-
-check_api_server_url () {
-    set_public_ip
-    CLOUD_INSTANCE_API_SERVER_URL="$PUBLIC_IP:6443";
 }
 
 check_node_name () {
@@ -120,22 +134,12 @@ check_node_name () {
 }
 
 check_cluster_cidr () {
-    check_node_name;
-    CLOUD_INSTANCE_CLUSTER_CIDR=$(kubectl get nodes $NODE_NAME -o jsonpath='{.spec.podCIDR}');
+    check_node_name
+    PHYSICAL_INSTANCE_CLUSTER_CIDR=$(kubectl get nodes $NODE_NAME -o jsonpath='{.spec.podCIDR}');
 }
 
 check_service_cidr () {
-    CLOUD_INSTANCE_SERVICE_CIDR=$(echo '{"apiVersion":"v1","kind":"Service","metadata":{"name":"tst"},"spec":{"clusterIP":"1.1.1.1","ports":[{"port":443}]}}' | kubectl apply -f - 2>&1 | sed 's/.*valid IPs is //');
-}
-
-check_inputs () {
-    set_organization;
-    set_team;
-    set_region;
-    set_cloud_instance;
-    set_cloud_instance_alias;
-    set_desired_cluster_cidr;
-    set_desired_service_cidr;
+    PHYSICAL_INSTANCE_SERVICE_CIDR=$(echo '{"apiVersion":"v1","kind":"Service","metadata":{"name":"tst"},"spec":{"clusterIP":"1.1.1.1","ports":[{"port":443}]}}' | kubectl apply -f - 2>&1 | sed 's/.*valid IPs is //');
 }
 
 opening () {
@@ -163,35 +167,18 @@ install_tools () {
     chmod a+x /usr/local/bin/yq;
 }
 
-set_up_nvidia_container_runtime () {
-    print_log "Setting up NVIDIA container runtime...";
-    DEBIAN_FRONTEND=noninteractive
-    apt-get update;
-    apt-get install -y gnupg linux-headers-$(uname -r);
-    apt-get install -y --no-install-recommends nvidia-driver-470;
-    distribution=$(. /etc/os-release;echo $ID$VERSION_ID);
-    curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | apt-key add -;
-    curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | tee /etc/apt/sources.list.d/nvidia-docker.list;
-    apt-get update;
-    apt-get install -y nvidia-container-runtime;
-}
-
 set_up_k3s () {
     print_log "Setting up k3s...";
     curl -sfL https://get.k3s.io | \
         INSTALL_K3S_VERSION=$K3S_VERSION+k3s1 \
         K3S_KUBECONFIG_MODE="644" \
-        INSTALL_K3S_EXEC="  --cluster-cidr=$DESIRED_CLUSTER_CIDR --service-cidr=$DESIRED_SERVICE_CIDR    --cluster-domain=$CLOUD_INSTANCE.local --disable-network-policy --disable=traefik --disable=local-storage" sh -;
+        INSTALL_K3S_EXEC="  --cluster-cidr=$DESIRED_CLUSTER_CIDR --service-cidr=$DESIRED_SERVICE_CIDR    --cluster-domain=$PHYSICAL_INSTANCE.local --disable-network-policy --disable=traefik --disable=local-storage" sh -;
     sleep 5;
 }
 
 check_cluster () {
-    print_log "Checking cluster health...";
-    check_api_server_url;
     check_cluster_cidr;
     check_service_cidr;
-    set_public_ip
-    curl -vk --resolve $PUBLIC_IP:6443:127.0.0.1  https://$PUBLIC_IP:6443/ping;
 }
 
 label_node () {
@@ -203,6 +190,7 @@ label_node () {
         robolaunch.io/team=$TEAM \
         robolaunch.io/cloud-instance=$CLOUD_INSTANCE \
         robolaunch.io/cloud-instance-alias=$CLOUD_INSTANCE_ALIAS \
+        robolaunch.io/physical-instance=$PHYSICAL_INSTANCE \
         submariner.io/gateway="true";
 }
 
@@ -216,30 +204,11 @@ update_helm_repositories () {
 
 install_openebs () {
     print_log "Installing openebs... This might take around one minute.";
-    helm install openebs openebs/openebs \
+    helm upgrade -i openebs openebs/openebs \
     --namespace openebs \
     --create-namespace;
     sleep 5;
     kubectl patch storageclass openebs-hostpath -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}';
-}
-
-install_nvidia_device_plugin () {
-    print_log "Installing nvidia-device-plugin... This might take around one minute.";
-    echo "version: v1
-sharing:
-  timeSlicing:
-    resources:
-    - name: nvidia.com/gpu
-      replicas: 4# number of slice for 1 core" > nvidia-device-plugin-config.yaml
-    wget https://github.com/robolaunch/k8s-device-plugin/releases/download/v0.13.0/nvidia-device-plugin-0.13.0.tgz;
-    helm upgrade -i nvdp ./nvidia-device-plugin-0.13.0.tgz \
-    --version=0.13.0 \
-    --namespace nvidia-device-plugin \
-    --create-namespace \
-    --set-file config.map.config=nvidia-device-plugin-config.yaml \
-    --set runtimeClassName=nvidia;
-    rm -rf nvidia-device-plugin-0.13.0.tgz;
-    rm -rf nvidia-device-plugin-config.yaml;
 }
 
 install_cert_manager () {
@@ -283,45 +252,69 @@ check_connection_hub_phase () {
     done
 }
 
-deploy_connection_hub () {
-    print_log "Deploying connection hub..."
+join_connection_hub () {
+    print_log "Joining connection hub...";
     check_cluster
-    wget $CH_CLOUD_INSTANCE_URL;
-    yq e -i ".metadata.labels.\"robolaunch.io/cloud-instance\" = \"$CLOUD_INSTANCE\"" ch-ci.yaml;
-    yq e -i ".metadata.labels.\"robolaunch.io/cloud-instance-alias\" = \"$CLOUD_INSTANCE_ALIAS\"" ch-ci.yaml;
-    yq e -i ".spec.submarinerSpec.apiServerURL = \"$CLOUD_INSTANCE_API_SERVER_URL\"" ch-ci.yaml;
-    yq e -i ".spec.submarinerSpec.clusterCIDR = \"$CLOUD_INSTANCE_CLUSTER_CIDR\"" ch-ci.yaml;
-    yq e -i ".spec.submarinerSpec.serviceCIDR = \"$CLOUD_INSTANCE_SERVICE_CIDR\"" ch-ci.yaml;
+    echo $CONNECTION_HUB_KEY | base64 --decode > ch-pi.yaml;
+    yq e -i ".metadata.labels.\"robolaunch.io/physical-instance\" = \"$PHYSICAL_INSTANCE\"" ch-pi.yaml;
+    yq e -i ".spec.submarinerSpec.clusterCIDR = \"$PHYSICAL_INSTANCE_CLUSTER_CIDR\"" ch-pi.yaml;
+    yq e -i ".spec.submarinerSpec.serviceCIDR = \"$PHYSICAL_INSTANCE_SERVICE_CIDR\"" ch-pi.yaml;
     
     CH_INSTALL_SUCCEEDED="false"
     while [ "$CH_INSTALL_SUCCEEDED" != "true" ]
     do 
         CH_INSTALL_SUCCEEDED="true"
-        kubectl apply -f ch-ci.yaml || CH_INSTALL_SUCCEEDED="false";
+        kubectl apply -f ch-pi.yaml || CH_INSTALL_SUCCEEDED="false";
         sleep 3;
     done
-
-    rm -rf ch-ci.yaml
+    
+    rm -rf ch-pi.yaml;
     check_connection_hub_phase;
 }
 
-display_connection_hub_key () {
-    CONNECTION_HUB_KEY=$(kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P);
-    printf "\n\n";
-    echo $CONNECTION_HUB_KEY;
-    printf "\n";
-    print_log "You can use this key to establish a connection with cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+check_cloud_instance_phase () {
+    while [ true ]
+    do
+        CLOUD_INSTANCE_PHASE=$(kubectl get cloudinstances $CLOUD_INSTANCE -o jsonpath="{.status.phase}" | yq -P);
+        if [ "$CLOUD_INSTANCE_PHASE" = "Connected" ]; then
+            break;
+        fi
+
+        print_log "Checking connection status...";
+        sleep 3;
+    done
 }
 
+display_info () {
+    check_cluster;
+    PHYSICAL_INSTANCE_API_SERVER_URL="https://"${PHYSICAL_INSTANCE_CLUSTER_CIDR%0/*}"1:6443"
+    CERT_AUTHORITY_DATA=$(yq '.clusters[] | select(.name == "default") | .cluster.certificate-authority-data' $KUBECONFIG);
+    CLIENT_CERTIFICATE=$(yq '.users[] | select(.name == "default") | .user.client-certificate-data' $KUBECONFIG);
+    CLIENT_KEY=$(yq '.users[] | select(.name == "default") | .user.client-key-data' $KUBECONFIG);
+    printf "\n\n"
+    echo \
+"cat <<EOF | kubectl apply -f -
+apiVersion: connection-hub.roboscale.io/v1alpha1
+kind: PhysicalInstance
+metadata:
+  name: $PHYSICAL_INSTANCE
+spec:
+  server: $PHYSICAL_INSTANCE_API_SERVER_URL
+  credentials:
+    certificateAuthority: $CERT_AUTHORITY_DATA
+    clientCertificate: $CLIENT_CERTIFICATE
+    clientKey: $CLIENT_KEY
+EOF";
+    printf "\n";
+    print_log "Physical instance is connected to the cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+    print_log "In order to complete registration of physical instance you should run the command above in cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+}
 
 opening >&3
 (check_inputs)
 
 print_global_log "Installing tools...";
 (install_tools)
-
-print_global_log "Setting up NVIDIA container runtime...";
-(set_up_nvidia_container_runtime)
 
 print_global_log "Setting up k3s cluster...";
 (set_up_k3s)
@@ -338,16 +331,16 @@ print_global_log "Updating Helm repositories...";
 print_global_log "Installing openebs...";
 (install_openebs)
 
-print_global_log "Installing NVIDIA device plugin...";
-(install_nvidia_device_plugin)
-
 print_global_log "Installing cert-manager...";
 (install_cert_manager)
 
 print_global_log "Installing robolaunch Operator Suite...";
 (install_operator_suite)
 
-print_global_log "Deploying Connection Hub...";
-(deploy_connection_hub)
+print_global_log "Joining connection hub $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE...";
+(join_connection_hub)
 
-display_connection_hub_key >&3
+print_global_log "Checking connection status...";
+(check_cloud_instance_phase)
+
+display_info >&3
