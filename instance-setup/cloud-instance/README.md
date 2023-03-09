@@ -3,12 +3,15 @@
 This is the table of contents for this document.
 
 - [Quick Start](#quick-start)
+  - [Running the Script](#running-the-script)
   - [Getting Connection Hub Key](#get-connection-hub-key)
 - [Components](#components)
 
 ## Quick Start
 
 This document assumes you have a virtual machine (with `amd64` architecture) provisioned on any cloud provider and has Ubuntu 20.04 or 22.04 on it.
+
+### Running the Script
 
 Run the following command to set up cloud instance:
 
