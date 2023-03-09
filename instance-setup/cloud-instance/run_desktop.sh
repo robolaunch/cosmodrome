@@ -104,8 +104,7 @@ set_desired_service_cidr () {
 
 set_internal_ip () {
     if [[ -z "${INTERNAL_IP}" ]]; then
-        HOSTNAME=$(hostname -I)
-        INTERNAL_IP=${HOSTNAME% *};
+        INTERNAL_IP=$(hostname -I | sed 's/|/ /' | awk '{print $1}')
     else
         INTERNAL_IP=$INTERNAL_IP;
     fi
