@@ -19,7 +19,7 @@ NC='\033[0m';
 CERT_MANAGER_VERSION="v1.8.0";
 OPERATOR_SUITE_VERSION="0.1.0";
 K3S_VERSION="v1.24.10"
-TARGETARCH="arm64"
+ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
 
@@ -159,11 +159,11 @@ install_tools () {
     # helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash;
     # install kubectl
-    curl -LO https://dl.k8s.io/release/$K3S_VERSION/bin/linux/${TARGETARCH}/kubectl;
+    curl -LO https://dl.k8s.io/release/$K3S_VERSION/bin/linux/${ARCH}/kubectl;
     install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl;
     rm -rf kubectl;
     # install yq
-    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${TARGETARCH};
+    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH};
     chmod a+x /usr/local/bin/yq;
 }
 
