@@ -223,6 +223,17 @@ install_openebs () {
     kubectl patch storageclass openebs-hostpath -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}';
 }
 
+install_nvidia_runtime_class () {
+    print_log "Installing NVIDIA runtime class...";
+    cat << EOF | kubectl apply -f -
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: nvidia
+handler: nvidia
+EOF
+}
+
 install_nvidia_device_plugin () {
     print_log "Installing nvidia-device-plugin... This might take around one minute.";
     echo "version: v1
@@ -230,7 +241,7 @@ sharing:
   timeSlicing:
     resources:
     - name: nvidia.com/gpu
-      replicas: 4# number of slice for 1 core" > nvidia-device-plugin-config.yaml
+      replicas: 4 # number of slice for 1 core" > nvidia-device-plugin-config.yaml
     wget https://github.com/robolaunch/k8s-device-plugin/releases/download/v0.13.0/nvidia-device-plugin-0.13.0.tgz;
     helm upgrade -i nvdp ./nvidia-device-plugin-0.13.0.tgz \
     --version=0.13.0 \
@@ -337,6 +348,9 @@ print_global_log "Updating Helm repositories...";
 
 print_global_log "Installing openebs...";
 (install_openebs)
+
+print_global_log "Installing NVIDIA runtime class...";
+(install_nvidia_runtime_class)
 
 print_global_log "Installing NVIDIA device plugin...";
 (install_nvidia_device_plugin)
