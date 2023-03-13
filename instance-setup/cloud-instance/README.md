@@ -13,18 +13,21 @@ This document assumes you have **a desktop environment** or **virtual machine** 
 
 ### Running the Script
 
-Run the following command to set up cloud instance:
+Run the following commands to set up cloud instance:
 
 ```bash
 # replace `run.sh` with `run_desktop.sh` if you are in a desktop environment
-ORGANIZATION=sample-org \
-TEAM=sample-team \
-REGION=sample-region \
-CLOUD_INSTANCE=cloud-instance \
-CLOUD_INSTANCE_ALIAS=my-first-instance \
-DESIRED_CLUSTER_CIDR=10.100.1.0/24 \
-DESIRED_SERVICE_CIDR=10.100.2.0/24 \
-curl https://raw.githubusercontent.com/robolaunch/cosmodrome/main/instance-setup/cloud-instance/run.sh | bash
+sudo -i # login as root
+export ORGANIZATION=sample-org
+export TEAM=sample-team
+export REGION=sample-region
+export CLOUD_INSTANCE=cloud-instance
+export CLOUD_INSTANCE_ALIAS=my-first-instance
+export DESIRED_CLUSTER_CIDR=10.100.1.0/24
+export DESIRED_SERVICE_CIDR=10.100.2.0/24
+wget https://raw.githubusercontent.com/robolaunch/cosmodrome/main/instance-setup/cloud-instance/run.sh
+chmod +x run.sh
+./run.sh
 ```
 
 The output will be similar to this:

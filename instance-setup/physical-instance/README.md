@@ -13,20 +13,22 @@ This is the table of contents for this document.
 This document assumes you have an `arm64` computer (eg. Raspberry PI 4) virtual machine (with `arm64` architecture) provisioned on any cloud provider and has Ubuntu 20.04 or 22.04 on it. Also you should complete the steps about [setting up cloud instance](../cloud-instance/README.md) before starting.
 
 ### Running the Script
-Run the following command to register physical instance:
+Run the following commands to register physical instance:
 
 ```bash
 # inside physical instance
+sudo -i # login as root
 export CONNECTION_HUB_KEY="<REDACTED>" # enter the key obtained previous section
-ORGANIZATION=sample-org \
-TEAM=sample-team \
-REGION=sample-region \
-CLOUD_INSTANCE=cloud-instance \
-CLOUD_INSTANCE_ALIAS=my-first-instance \
-PHYSICAL_INSTANCE=cloudy-agv \
-DESIRED_CLUSTER_CIDR=10.20.1.0/24 \ # should be unique per physical instance
-DESIRED_SERVICE_CIDR=10.20.2.0/24 \ # should be unique per physical instance
-curl https://raw.githubusercontent.com/robolaunch/cosmodrome/main/instance-setup/physical-instance/run.sh | bash
+export ORGANIZATION=sample-org
+export TEAM=sample-team
+export REGION=sample-region
+export CLOUD_INSTANCE=cloud-instance
+export CLOUD_INSTANCE_ALIAS=my-first-instance
+export PHYSICAL_INSTANCE=cloudy-agv
+export DESIRED_CLUSTER_CIDR=10.20.1.0/24 # should be unique per physical instance
+export DESIRED_SERVICE_CIDR=10.20.2.0/24 # should be unique per physical instance
+wget https://raw.githubusercontent.com/robolaunch/cosmodrome/main/instance-setup/physical-instance/run.sh
+chmod +x run.sh
 ```
 
 The output will be similar to this:
