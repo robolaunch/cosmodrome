@@ -29,6 +29,7 @@ export DESIRED_CLUSTER_CIDR=10.20.1.0/24 # should be unique per physical instanc
 export DESIRED_SERVICE_CIDR=10.20.2.0/24 # should be unique per physical instance
 wget https://raw.githubusercontent.com/robolaunch/cosmodrome/main/instance-setup/physical-instance/run.sh
 chmod +x run.sh
+./run.sh
 ```
 
 The output will be similar to this:
