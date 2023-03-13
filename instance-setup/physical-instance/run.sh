@@ -8,6 +8,7 @@
 # PHYSICAL_INSTANCE=robot-cloudy-01 \
 # DESIRED_CLUSTER_CIDR=10.20.1.0/24 \
 # DESIRED_SERVICE_CIDR=10.20.2.0/24 \
+# NETWORK=External \
 # ./run.sh
 
 set -e;
@@ -49,6 +50,7 @@ check_inputs () {
     set_connection_hub_key;
     set_desired_cluster_cidr;
     set_desired_service_cidr;
+    set_network;
 }
 
 set_cluster_root_domain () {
@@ -118,6 +120,14 @@ set_desired_service_cidr () {
         print_err "Environment variable DESIRED_SERVICE_CIDR should be set.";
     else
         DESIRED_SERVICE_CIDR=$DESIRED_SERVICE_CIDR;
+    fi
+}
+
+set_network () {
+    if [[ -z "${NETWORK}" ]]; then
+        print_err "Environment variable NETWORK should be set.";
+    else
+        NETWORK=$NETWORK;
     fi
 }
 
@@ -259,6 +269,7 @@ join_connection_hub () {
     yq e -i ".metadata.labels.\"robolaunch.io/physical-instance\" = \"$PHYSICAL_INSTANCE\"" ch-pi.yaml;
     yq e -i ".spec.submarinerSpec.clusterCIDR = \"$PHYSICAL_INSTANCE_CLUSTER_CIDR\"" ch-pi.yaml;
     yq e -i ".spec.submarinerSpec.serviceCIDR = \"$PHYSICAL_INSTANCE_SERVICE_CIDR\"" ch-pi.yaml;
+    yq e -i ".spec.submarinerSpec.networkType = \"$NETWORK\"" ch-ci.yaml;
     
     CH_INSTALL_SUCCEEDED="false"
     while [ "$CH_INSTALL_SUCCEEDED" != "true" ]

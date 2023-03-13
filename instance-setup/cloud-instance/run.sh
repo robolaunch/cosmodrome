@@ -303,7 +303,6 @@ deploy_connection_hub () {
     yq e -i ".spec.submarinerSpec.apiServerURL = \"$CLOUD_INSTANCE_API_SERVER_URL\"" ch-ci.yaml;
     yq e -i ".spec.submarinerSpec.clusterCIDR = \"$CLOUD_INSTANCE_CLUSTER_CIDR\"" ch-ci.yaml;
     yq e -i ".spec.submarinerSpec.serviceCIDR = \"$CLOUD_INSTANCE_SERVICE_CIDR\"" ch-ci.yaml;
-    yq e -i ".spec.submarinerSpec.networkType = \"External\"" ch-ci.yaml;
     
     CH_INSTALL_SUCCEEDED="false"
     while [ "$CH_INSTALL_SUCCEEDED" != "true" ]
