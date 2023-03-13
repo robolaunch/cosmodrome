@@ -27,6 +27,7 @@ export CLOUD_INSTANCE_ALIAS=my-first-instance
 export PHYSICAL_INSTANCE=cloudy-agv
 export DESIRED_CLUSTER_CIDR=10.20.1.0/24 # should be unique per physical instance
 export DESIRED_SERVICE_CIDR=10.20.2.0/24 # should be unique per physical instance
+export NETWORK=External # should be `Local` if cloud instance uses desktop configuration
 wget https://raw.githubusercontent.com/robolaunch/cosmodrome/main/instance-setup/physical-instance/run.sh
 chmod +x run.sh
 ./run.sh
