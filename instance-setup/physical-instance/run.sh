@@ -269,7 +269,7 @@ join_connection_hub () {
     yq e -i ".metadata.labels.\"robolaunch.io/physical-instance\" = \"$PHYSICAL_INSTANCE\"" ch-pi.yaml;
     yq e -i ".spec.submarinerSpec.clusterCIDR = \"$PHYSICAL_INSTANCE_CLUSTER_CIDR\"" ch-pi.yaml;
     yq e -i ".spec.submarinerSpec.serviceCIDR = \"$PHYSICAL_INSTANCE_SERVICE_CIDR\"" ch-pi.yaml;
-    yq e -i ".spec.submarinerSpec.networkType = \"$NETWORK\"" ch-ci.yaml;
+    yq e -i ".spec.submarinerSpec.networkType = \"$NETWORK\"" ch-pi.yaml;
     
     CH_INSTALL_SUCCEEDED="false"
     while [ "$CH_INSTALL_SUCCEEDED" != "true" ]
