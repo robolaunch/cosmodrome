@@ -20,6 +20,22 @@ function build_vdi() {
 
 }
 
+
+function build_dev() {
+    ask_gpu_agnostic
+    if [ "$GPU_AGNOSTIC" != "true" ]; then
+        ask_driver
+    else
+        NVIDIA_DRIVER_VERSION="agnostic"
+    fi
+    
+    ask_ubuntu_desktop
+
+    DEV_IMAGE=$REGISTRY/$UBUNTU_DISTRO:$NVIDIA_DRIVER_VERSION-$UBUNTU_DESKTOP-amd64
+
+    docker_build_dev
+}
+
 function build_ros() {
 
     if [ "$CONTAINS_VDI" == "true" ]; then
@@ -428,6 +444,25 @@ function ask_contains_vdi(){
 
 }
 
+function ask_image_type(){
+
+    # ask image type
+    if [[ -z "${IMAGE_TYPE}" ]]; then
+
+        echo -n "Image type? (robot/dev): "
+        read IMAGE_TYPE
+
+    fi
+
+    if ! [[ "$IMAGE_TYPE" == "robot" || "$IMAGE_TYPE" == "dev" ]]; then
+        
+        echo "Wrong input for \"IMAGE_TYPE\". (robot/dev)"
+        exit 1;
+
+    fi
+
+}
+
 function ask_rebuild_robot(){
     
     # ask if robot will be rebuilt
@@ -486,6 +521,15 @@ function docker_build_vdi(){
     docker tag $VDI_IMAGE $VDI_IMAGE-amd64
     docker_push_image $VDI_IMAGE
     docker_push_image $VDI_IMAGE-amd64
+}
+
+function docker_build_dev(){
+    set -e
+
+    docker build ./os/ubuntu/$UBUNTU_DISTRO -t $DEV_IMAGE \
+    --build-arg BASE_IMAGE=$VDI_IMAGE-amd64
+
+    docker_push_image $DEV_IMAGE
 }
 
 function docker_build_ros(){
@@ -589,30 +633,61 @@ cd "$(dirname "$0")"
 ask_registry
 ask_push_images
 ask_contains_vdi
-ask_rebuild_robot
+ask_image_type
 ask_ubuntu_distro
 
 if [ "$CONTAINS_VDI" == "true" ]; then
     
-    if [ "$REBUILD_ROBOT" == "true" ]; then
 
-        ask_rebuild_vdi
+    ask_rebuild_vdi
 
-        if [ "$REBUILD_VDI" == "true" ]; then
-            build_vdi
-            build_ros
-            build_robolaunch_robot
-            build_robot
+    if [ "$REBUILD_VDI" == "true" ]; then
+        build_vdi
+
+        if [ "$IMAGE_TYPE" == "dev" ]; then
+
+            build_dev
+
         else
-            build_ros
-            build_robolaunch_robot
-            build_robot
+
+            ask_rebuild_robot
+
+            if [ "$REBUILD_ROBOT" == "true" ]; then
+
+                build_ros
+                build_robolaunch_robot
+                build_robot
+
+            else
+
+                build_robot
+
+            fi
+
         fi
 
     else
+        if [ "$IMAGE_TYPE" == "dev" ]; then
 
-        build_robot
+            build_dev
 
+        else
+
+            ask_rebuild_robot
+
+            if [ "$REBUILD_ROBOT" == "true" ]; then
+
+                build_ros
+                build_robolaunch_robot
+                build_robot
+
+            else
+
+                build_robot
+
+            fi
+
+        fi
     fi
 
 else
