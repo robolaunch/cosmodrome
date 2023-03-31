@@ -8,14 +8,29 @@ then
     exit 1;
 fi
 
-if [[ -z "${GPU_LATENCY}" ]]; then
-    echo "Environment GPU_LATENCY should be set.";
+if [[ -z "${INTERVAL}" ]]; then
+    echo "Environment INTERVAL should be set.";
+    exit 1;
+fi
+
+if [[ -z "${METRICS_EXPORTER_NAME}" ]]; then
+    echo "Environment METRICS_EXPORTER_NAME should be set.";
+    exit 1;
+fi
+
+if [[ -z "${METRICS_EXPORTER_NAMESPACE}" ]]; then
+    echo "Environment METRICS_EXPORTER_NAMESPACE should be set.";
     exit 1;
 fi
 
 while [ true ]
 do
-    nvidia-smi | grep "%" | awk '{print $13}';
-    sleep "$GPU_LATENCY";
-    # kubectl patch metricsexporter metricsexporter-sample --type=merge -n test --patch '{"spec":{"foo":"asd"}}'
+    PERCENTAGE=$(nvidia-smi | grep "%" | awk '{print $13}');
+    sleep "$INTERVAL";
+    kubectl patch metricsexporter $METRICS_EXPORTER_NAME \
+        --type=merge \
+        --subresource status \
+        -n $METRICS_EXPORTER_NAMESPACE \
+        --patch \
+        "{\"status\": {\"usage\": {\"gpu\": {\"utilization\": \"$PERCENTAGE\"}}}}";
 done
