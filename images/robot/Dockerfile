@@ -11,7 +11,7 @@ ARG BRIDGE_DISTRO_1="foxy"
 ARG BRIDGE_DISTRO_2="foxy"
 
 SHELL [ "/bin/bash", "-c" ]
-RUN apt update && apt install -y \
+RUN apt-get update && apt install -y \
     curl \
     pip \
     git \
@@ -54,5 +54,7 @@ RUN git clone ${ROBOLAUNCH_HELPERS_REPO_URL} ${ROBOLAUNCH_HELPERS_PATH} -b ${ROB
 WORKDIR ${ROBOLAUNCH_HELPERS_PATH}
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-RUN apt-get dist-upgrade -y
+WORKDIR /
+RUN echo "Built and packaged: $(date -d @$(date -u +%s))" > image.info
+
 WORKDIR /root

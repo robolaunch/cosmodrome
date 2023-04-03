@@ -61,32 +61,32 @@ RUN git clone https://bitbucket.org/kaesystems/vdi /root/vdi/; \
 RUN /usr/local/go/bin/go get -v -t -d . && /usr/local/go/bin/go build -o bin/neko cmd/neko/main.go
 
 
-#
-# STAGE 2: CLIENT
-#
-FROM node:14-bullseye-slim as client
-WORKDIR /src
+# #
+# # STAGE 2: CLIENT
+# #
+# FROM node:14-bullseye-slim as client
+# WORKDIR /src
 
-#
-# install dependencies
+# #
+# # install dependencies
 
-RUN set -eux; apt-get update; \
-    apt-get install -y --no-install-recommends git
+# RUN set -eux; apt-get update; \
+#     apt-get install -y --no-install-recommends git
 
-# COPY client/package*.json ./
+# # COPY client/package*.json ./
 
-ENV GIT_SSL_NO_VERIFY="1"
+# ENV GIT_SSL_NO_VERIFY="1"
 
-RUN git clone https://bitbucket.org/kaesystems/vdi /root/vdi/; \
-    cp /root/vdi/client/package*.json ./
+# RUN git clone https://bitbucket.org/kaesystems/vdi /root/vdi/; \
+#     cp /root/vdi/client/package*.json ./
 
-RUN npm install
-#
-# build client
-# COPY client/ .
-RUN cp -a /root/vdi/client/. .
+# RUN npm install
+# #
+# # build client
+# # COPY client/ .
+# RUN cp -a /root/vdi/client/. .
 
-RUN npm run build
+# RUN npm run build
 
 #
 # STAGE 3: RUNTIME
