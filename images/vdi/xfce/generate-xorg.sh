@@ -36,11 +36,21 @@ if [ -f "/etc/X11/xorg.conf" ]; then
     rm /etc/X11/xorg.conf
 fi
 
+if [ -z "$RESOLUTION" ]; then
+  echo "No resolution is selected".
+  exit 0;
+else
+  IFS="x";
+  values=( $RESOLUTION )
+  RESOLUTION_WIDTH=${values[0]}
+  RESOLUTION_HEIGHT=${values[1]}
+fi
+
 HEX_ID=$(nvidia-smi --query-gpu=pci.bus_id --id="$GPU_SELECT" --format=csv | sed -n 2p)
 IFS=":." ARR_ID=($HEX_ID)
 unset IFS
 BUS_ID=PCI:$((16#${ARR_ID[1]})):$((16#${ARR_ID[2]})):$((16#${ARR_ID[3]}))
-export MODELINE=$(cvt -r 2048 1152 | sed -n 2p)
+export MODELINE=$(cvt -r $RESOLUTION_WIDTH $RESOLUTION_HEIGHT | sed -n 2p)
 nvidia-xconfig --depth="$CDEPTH" --mode=$(echo $MODELINE | awk '{print $2}' | tr -d '"') --allow-empty-initial-configuration --no-probe-all-gpus --busid="$BUS_ID" --only-one-x-screen --connected-monitor="$VIDEO_PORT"
 sed -i '/Driver\s\+"nvidia"/a\    Option         "ModeValidation" "NoMaxPClkCheck, NoEdidMaxPClkCheck, NoMaxSizeCheck, NoHorizSyncCheck, NoVertRefreshCheck, NoVirtualSizeCheck, NoExtendedGpuCapabilitiesCheck, NoTotalSizeCheck, NoDualLinkDVICheck, NoDisplayPortBandwidthCheck, AllowNon3DVisionModes, AllowNonHDMI3DModes, AllowNonEdidModes, NoEdidHDMI2Check, AllowDpInterlaced"\n    Option         "DPI" "96 x 96"' /etc/X11/xorg.conf
 sed -i '/Section\s\+"Monitor"/a\    '"$MODELINE" /etc/X11/xorg.conf
