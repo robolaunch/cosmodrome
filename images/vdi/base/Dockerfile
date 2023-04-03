@@ -58,7 +58,7 @@ RUN set -eux; apt-get update; \
 RUN git clone https://bitbucket.org/kaesystems/vdi /root/vdi/; \
     cp -a /root/vdi/server/* .
 
-RUN /usr/local/go/bin/go get -v -t -d . && /usr/local/go/bin/go build -o bin/neko cmd/neko/main.go
+RUN /usr/local/go/bin/go get -v -t -d . && /usr/local/go/bin/go build -o bin/robolaunch-vdi cmd/neko/main.go
 
 
 # #
@@ -174,8 +174,8 @@ ENV NEKO_PASSWORD_ADMIN=admin
 ENV RENDER_GID=
 
 ARG APP_CACHEBUST=1
-COPY --from=client /src/dist/ /var/www/
-COPY --from=server /src/bin/neko /usr/bin/neko
+# COPY --from=client /src/dist/ /var/www/
+COPY --from=server /src/bin/robolaunch-vdi /usr/bin/robolaunch-vdi
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=8 \
     CMD wget -O - http://localhost:${NEKO_BIND#*:}/health || exit 1

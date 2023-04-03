@@ -25,11 +25,11 @@ if [ -z "$GPU_SELECT" ]; then
   apt-get install -y xserver-xorg-video-dummy
   cp /etc/vdi/xorg.conf /etc/X11/xorg.conf
   sed -i 's|::X-ENTRYPOINT::|/usr/bin/X -config /etc/X11/xorg.conf %(ENV_DISPLAY)s|' /etc/vdi/supervisord.conf
-  sed -i 's|::NEKO_ENTRYPOINT::|/usr/bin/neko serve -d --static "/var/www" --bind "0.0.0.0:%(ENV_NEKO_BIND)s"   --epr "%(ENV_NEKO_UDP_PORT)s" --display "%(ENV_DISPLAY)s" --h264|' /etc/vdi/supervisord/xfce.conf
+  sed -i 's|::NEKO_ENTRYPOINT::|/usr/bin/robolaunch-vdi serve -d --static "/var/www" --bind "0.0.0.0:%(ENV_NEKO_BIND)s"   --epr "%(ENV_NEKO_UDP_PORT)s" --display "%(ENV_DISPLAY)s" --h264|' /etc/vdi/supervisord/xfce.conf
   exit 0
 else
   sed -i 's|::X-ENTRYPOINT::|/usr/bin/X vt7 -novtswitch -sharevts +extension "MIT-SHM" %(ENV_DISPLAY)s -config /etc/X11/xorg.conf %(ENV_DISPLAY)s|' /etc/vdi/supervisord.conf
-  sed -i 's|::NEKO_ENTRYPOINT::|/usr/bin/neko serve -d --static "/var/www" --bind "0.0.0.0:%(ENV_NEKO_BIND)s"   --epr "%(ENV_NEKO_UDP_PORT)s" --display "%(ENV_DISPLAY)s" --h264 --hwenc "NVENC" --rc_mode "1"|' /etc/vdi/supervisord/xfce.conf
+  sed -i 's|::NEKO_ENTRYPOINT::|/usr/bin/robolaunch-vdi serve -d --static "/var/www" --bind "0.0.0.0:%(ENV_NEKO_BIND)s"   --epr "%(ENV_NEKO_UDP_PORT)s" --display "%(ENV_DISPLAY)s" --h264 --hwenc "NVENC" --rc_mode "1"|' /etc/vdi/supervisord/xfce.conf
 fi
 
 if [ -f "/etc/X11/xorg.conf" ]; then
