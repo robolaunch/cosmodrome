@@ -210,7 +210,7 @@ update_helm_repositories () {
     print_log "Updating Helm repositories...";
     helm repo add openebs https://openebs.github.io/charts;
     helm repo add jetstack https://charts.jetstack.io;
-    helm repo add robolaunch http://charts.robolaunch.dev/helm;
+    helm repo add robolaunch https://robolaunch.github.io/charts;
     helm repo update;
 }
 
