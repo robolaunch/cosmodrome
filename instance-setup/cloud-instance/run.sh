@@ -20,8 +20,11 @@ ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
 
+OPERATOR_SUITE_VERSION="0.1.0";
+
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
+
 
 print_global_log () {
     echo -e "${BLUE}$1${NC}" >&3;
@@ -148,20 +151,24 @@ opening () {
     printf "\n";
 }
 
-install_tools () {
+install_pre_tools () {
     print_log "Installing Tools...";
     # apt packages
     apt-get update;
     apt-get install -y curl wget;
+    # install yq
+    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH};
+    chmod a+x /usr/local/bin/yq;
+}
+
+install_post_tools () {
+    print_log "Installing Tools...";
     # helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash;
     # install kubectl
     curl -LO https://dl.k8s.io/release/$K3S_VERSION/bin/linux/${ARCH}/kubectl;
     install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl;
     rm -rf kubectl;
-    # install yq
-    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH};
-    chmod a+x /usr/local/bin/yq;
 }
 
 set_up_nvidia_container_runtime () {
@@ -349,7 +356,7 @@ display_connection_hub_key () {
 }
 
 print_global_log "Waiting for the preflight checks...";
-(install_tools)
+(install_pre_tools)
 (get_versioning_map)
 
 # Specifying platform & component versions
@@ -365,6 +372,9 @@ FLEET_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.
 
 opening >&3
 (check_inputs)
+
+print_global_log "Installing tools...";
+(install_post_tools)
 
 print_global_log "Setting up NVIDIA container runtime...";
 (set_up_nvidia_container_runtime)
