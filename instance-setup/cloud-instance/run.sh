@@ -20,11 +20,8 @@ ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
 
-OPERATOR_SUITE_VERSION="0.1.0";
-
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
-
 
 print_global_log () {
     echo -e "${BLUE}$1${NC}" >&3;
@@ -145,7 +142,7 @@ opening () {
     apt-get update 2>/dev/null 1>/dev/null;
     apt-get install -y figlet 2>/dev/null 1>/dev/null; 
     figlet 'robolaunch' -f slant;
-    echo $PLATFORM_VERSION;
+    echo "Cloud Robotics Platform $PLATFORM_VERSION";
     printf "\n";
     echo "\"We Empower ROS/ROS2 based GPU Offloaded Robots & Geographically Distributed Fleets\"";
     printf "\n";
@@ -266,19 +263,41 @@ install_cert_manager () {
 
 install_operator_suite () {
     print_log "Installing operator Helm charts... This might take around one minute."
-    HELM_INSTALL_SUCCEEDED="false"
-
-    while [ "$HELM_INSTALL_SUCCEEDED" != "true" ]
+    
+    CHO_HELM_INSTALL_SUCCEEDED="false"
+    while [ "$CHO_HELM_INSTALL_SUCCEEDED" != "true" ]
     do 
-        HELM_INSTALL_SUCCEEDED="true"
+        CHO_HELM_INSTALL_SUCCEEDED="true"
         helm upgrade -i \
-            operator-suite robolaunch/operator-suite \
-            --set global.organization=$ORGANIZATION \
-            --set global.team=$TEAM \
-            --set global.region=$REGION \
-            --set global.cloudInstance=$CLOUD_INSTANCE \
-            --set global.cloudInstanceAlias=$CLOUD_INSTANCE_ALIAS \
-            --version $OPERATOR_SUITE_VERSION || HELM_INSTALL_SUCCEEDED="false";
+            connection-hub-operator robolaunch/connection-hub-operator \
+            --namespace connection-hub-system \
+            --create-namespace \
+            --version $CONNECTION_HUB_OPERATOR_CHART_VERSION || CHO_HELM_INSTALL_SUCCEEDED="false";
+        sleep 1;
+    done
+
+    RO_HELM_INSTALL_SUCCEEDED="false"
+    while [ "$RO_HELM_INSTALL_SUCCEEDED" != "true" ]
+    do 
+        RO_HELM_INSTALL_SUCCEEDED="true"
+        helm upgrade -i \
+            robot-operator robolaunch/robot-operator \
+            --namespace robot-system \
+            --create-namespace \
+            --version $ROBOT_OPERATOR_CHART_VERSION || RO_HELM_INSTALL_SUCCEEDED="false";
+        sleep 1;
+    done
+
+    FO_HELM_INSTALL_SUCCEEDED="false"
+    while [ "$FO_HELM_INSTALL_SUCCEEDED" != "true" ]
+    do 
+        FO_HELM_INSTALL_SUCCEEDED="true"
+        helm upgrade -i \
+            fleet-operator robolaunch/fleet-operator \
+            --namespace fleet-system \
+            --create-namespace \
+            --version $FLEET_OPERATOR_CHART_VERSION || FO_HELM_INSTALL_SUCCEEDED="false";
+        sleep 1;
     done
 
     sleep 30;
@@ -340,9 +359,9 @@ fi
 VERSION_SELECTOR_STR='.versions[] | select(.version == "'"$PLATFORM_VERSION"'")'
 K3S_VERSION=v$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.version' < platform.yaml)
 CERT_MANAGER_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.components.cert-manager.version' < platform.yaml)
-CONNECTION_HUB_OPERATOR_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.connectionHub.version' < platform.yaml)
-ROBOT_OPERATOR_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.robot.version' < platform.yaml)
-FLEET_OPERATOR_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.fleet.version' < platform.yaml)
+CONNECTION_HUB_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.connectionHub.helm.version' < platform.yaml)
+ROBOT_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.robot.helm.version' < platform.yaml)
+FLEET_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.fleet.helm.version' < platform.yaml)
 
 opening >&3
 (check_inputs)
