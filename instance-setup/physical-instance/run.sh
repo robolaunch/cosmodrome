@@ -17,9 +17,6 @@ BLUE='\033[0;34m';
 RED='\033[0;31m';
 NC='\033[0m';
 
-CERT_MANAGER_VERSION="v1.8.0";
-OPERATOR_SUITE_VERSION="0.1.0";
-K3S_VERSION="v1.24.10"
 ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
@@ -38,19 +35,6 @@ print_log () {
 print_err () {
     echo -e "${RED}Error: $1${NC}" >&3;
     exit 1;
-}
-
-check_inputs () {
-    set_organization;
-    set_team;
-    set_region;
-    set_cloud_instance;
-    set_cloud_instance_alias;
-    set_physical_instance;
-    set_connection_hub_key;
-    set_desired_cluster_cidr;
-    set_desired_service_cidr;
-    set_network;
 }
 
 set_cluster_root_domain () {
@@ -152,29 +136,52 @@ check_service_cidr () {
     PHYSICAL_INSTANCE_SERVICE_CIDR=$(echo '{"apiVersion":"v1","kind":"Service","metadata":{"name":"tst"},"spec":{"clusterIP":"1.1.1.1","ports":[{"port":443}]}}' | kubectl apply -f - 2>&1 | sed 's/.*valid IPs is //');
 }
 
+check_inputs () {
+    set_organization;
+    set_team;
+    set_region;
+    set_cloud_instance;
+    set_cloud_instance_alias;
+    set_physical_instance;
+    set_connection_hub_key;
+    set_desired_cluster_cidr;
+    set_desired_service_cidr;
+    set_network;
+}
+
+get_versioning_map () {
+    wget https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml;
+}
+
 opening () {
     apt-get update 2>/dev/null 1>/dev/null;
     apt-get install -y figlet 2>/dev/null 1>/dev/null; 
     figlet 'robolaunch' -f slant;
+    echo "Cloud Robotics Platform $PLATFORM_VERSION";
     printf "\n";
     echo "\"We Empower ROS/ROS2 based GPU Offloaded Robots & Geographically Distributed Fleets\"";
     printf "\n";
 }
 
-install_tools () {
+
+install_pre_tools () {
     print_log "Installing Tools...";
     # apt packages
     apt-get update;
     apt-get install -y curl wget;
+    # install yq
+    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH};
+    chmod a+x /usr/local/bin/yq;
+}
+
+install_post_tools () {
+    print_log "Installing Tools...";
     # helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash;
     # install kubectl
     curl -LO https://dl.k8s.io/release/$K3S_VERSION/bin/linux/${ARCH}/kubectl;
     install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl;
     rm -rf kubectl;
-    # install yq
-    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH};
-    chmod a+x /usr/local/bin/yq;
 }
 
 set_up_k3s () {
@@ -230,22 +237,44 @@ install_cert_manager () {
 
 install_operator_suite () {
     print_log "Installing operator Helm charts... This might take around one minute."
-    HELM_INSTALL_SUCCEEDED="false"
-
-    while [ "$HELM_INSTALL_SUCCEEDED" != "true" ]
+    
+    CHO_HELM_INSTALL_SUCCEEDED="false"
+    while [ "$CHO_HELM_INSTALL_SUCCEEDED" != "true" ]
     do 
-        HELM_INSTALL_SUCCEEDED="true"
+        CHO_HELM_INSTALL_SUCCEEDED="true"
         helm upgrade -i \
-            operator-suite robolaunch/operator-suite \
-            --set global.organization=$ORGANIZATION \
-            --set global.team=$TEAM \
-            --set global.region=$REGION \
-            --set global.cloudInstance=$CLOUD_INSTANCE \
-            --set global.cloudInstanceAlias=$CLOUD_INSTANCE_ALIAS \
-            --version $OPERATOR_SUITE_VERSION || HELM_INSTALL_SUCCEEDED="false";
+            connection-hub-operator robolaunch/connection-hub-operator \
+            --namespace connection-hub-system \
+            --create-namespace \
+            --version $CONNECTION_HUB_OPERATOR_CHART_VERSION || CHO_HELM_INSTALL_SUCCEEDED="false";
+        sleep 1;
     done
 
-    sleep 30;
+    RO_HELM_INSTALL_SUCCEEDED="false"
+    while [ "$RO_HELM_INSTALL_SUCCEEDED" != "true" ]
+    do 
+        RO_HELM_INSTALL_SUCCEEDED="true"
+        helm upgrade -i \
+            robot-operator robolaunch/robot-operator \
+            --namespace robot-system \
+            --create-namespace \
+            --version $ROBOT_OPERATOR_CHART_VERSION || RO_HELM_INSTALL_SUCCEEDED="false";
+        sleep 1;
+    done
+
+    FO_HELM_INSTALL_SUCCEEDED="false"
+    while [ "$FO_HELM_INSTALL_SUCCEEDED" != "true" ]
+    do 
+        FO_HELM_INSTALL_SUCCEEDED="true"
+        helm upgrade -i \
+            fleet-operator robolaunch/fleet-operator \
+            --namespace fleet-system \
+            --create-namespace \
+            --version $FLEET_OPERATOR_CHART_VERSION || FO_HELM_INSTALL_SUCCEEDED="false";
+        sleep 1;
+    done
+
+    sleep 15;
 }
 
 check_connection_hub_phase () {
@@ -321,11 +350,26 @@ EOF";
     print_log "In order to complete registration of physical instance you should run the command above in cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
 }
 
+print_global_log "Waiting for the preflight checks...";
+(install_pre_tools)
+(get_versioning_map)
+
+# Specifying platform & component versions
+if [[ -z "${PLATFORM_VERSION}" ]]; then
+    PLATFORM_VERSION=$(yq '.versions[0].version' < platform.yaml)
+fi
+VERSION_SELECTOR_STR='.versions[] | select(.version == "'"$PLATFORM_VERSION"'")'
+K3S_VERSION=v$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.version' < platform.yaml)
+CERT_MANAGER_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.components.cert-manager.version' < platform.yaml)
+CONNECTION_HUB_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.connectionHub.helm.version' < platform.yaml)
+ROBOT_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.robot.helm.version' < platform.yaml)
+FLEET_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.fleet.helm.version' < platform.yaml)
+
 opening >&3
 (check_inputs)
 
 print_global_log "Installing tools...";
-(install_tools)
+(install_post_tools)
 
 print_global_log "Setting up k3s cluster...";
 (set_up_k3s)

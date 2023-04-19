@@ -20,11 +20,8 @@ ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
 
-OPERATOR_SUITE_VERSION="0.1.0";
-
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
-
 
 print_global_log () {
     echo -e "${BLUE}$1${NC}" >&3;
@@ -307,7 +304,7 @@ install_operator_suite () {
         sleep 1;
     done
 
-    sleep 30;
+    sleep 15;
 }
 
 check_connection_hub_phase () {
