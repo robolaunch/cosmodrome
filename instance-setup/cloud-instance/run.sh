@@ -15,17 +15,16 @@ BLUE='\033[0;34m';
 RED='\033[0;31m';
 NC='\033[0m';
 
-CERT_MANAGER_VERSION="v1.8.0";
-OPERATOR_SUITE_VERSION="0.1.0";
 CH_CLOUD_INSTANCE_URL="https://gist.githubusercontent.com/tunahanertekin/f041e2c3fbc6cdaadd72816c350b357c/raw/ac86a73e70ea8dce5903eed3472b26afdc255f0d/ch-ci.yaml";
-K3S_VERSION="v1.24.10"
 ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
 
+OPERATOR_SUITE_VERSION="0.1.0";
 
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
+
 
 print_global_log () {
     echo -e "${BLUE}$1${NC}" >&3;
@@ -138,10 +137,15 @@ check_inputs () {
     set_desired_service_cidr;
 }
 
+get_versioning_map () {
+    wget https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml;
+}
+
 opening () {
     apt-get update 2>/dev/null 1>/dev/null;
     apt-get install -y figlet 2>/dev/null 1>/dev/null; 
     figlet 'robolaunch' -f slant;
+    echo $PLATFORM_VERSION;
     printf "\n";
     echo "\"We Empower ROS/ROS2 based GPU Offloaded Robots & Geographically Distributed Fleets\"";
     printf "\n";
@@ -325,12 +329,23 @@ display_connection_hub_key () {
     print_log "You can use this key to establish a connection with cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
 }
 
+print_global_log "Waiting for the preflight checks...";
+(install_tools)
+(get_versioning_map)
+
+# Specifying platform & component versions
+if [[ -z "${PLATFORM_VERSION}" ]]; then
+    PLATFORM_VERSION=$(yq '.versions[0].version' < platform.yaml)
+fi
+VERSION_SELECTOR_STR='.versions[] | select(.version == "'"$PLATFORM_VERSION"'")'
+K3S_VERSION=v$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.version' < platform.yaml)
+CERT_MANAGER_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.components.cert-manager.version' < platform.yaml)
+CONNECTION_HUB_OPERATOR_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.connectionHub.version' < platform.yaml)
+ROBOT_OPERATOR_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.robot.version' < platform.yaml)
+FLEET_OPERATOR_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.fleet.version' < platform.yaml)
 
 opening >&3
 (check_inputs)
-
-print_global_log "Installing tools...";
-(install_tools)
 
 print_global_log "Setting up NVIDIA container runtime...";
 (set_up_nvidia_container_runtime)
