@@ -44,6 +44,38 @@ set_cluster_root_domain () {
         | awk -F ' ' '{print $2}');
 }
 
+set_cloud_instance_ca () {
+    if [[ -z "${CLOUD_INSTANCE_CA}" ]]; then
+        print_err "Environment variable CLOUD_INSTANCE_CA should be set.";
+    else
+        CLOUD_INSTANCE_CA=$CLOUD_INSTANCE_CA;
+    fi
+}
+
+set_cloud_instance_api_server () {
+    if [[ -z "${CLOUD_INSTANCE_API_SERVER}" ]]; then
+        print_err "Environment variable CLOUD_INSTANCE_API_SERVER should be set.";
+    else
+        CLOUD_INSTANCE_API_SERVER=$CLOUD_INSTANCE_API_SERVER;
+    fi
+}
+
+set_cloud_instance_user () {
+    if [[ -z "${CLOUD_INSTANCE_USER}" ]]; then
+        print_err "Environment variable CLOUD_INSTANCE_USER should be set.";
+    else
+        CLOUD_INSTANCE_USER=$CLOUD_INSTANCE_USER;
+    fi
+}
+
+set_cloud_instance_oauth_token () {
+    if [[ -z "${CLOUD_INSTANCE_OAUTH_TOKEN}" ]]; then
+        print_err "Environment variable CLOUD_INSTANCE_OAUTH_TOKEN should be set.";
+    else
+        CLOUD_INSTANCE_OAUTH_TOKEN=$CLOUD_INSTANCE_OAUTH_TOKEN;
+    fi
+}
+
 set_organization () {
     if [[ -z "${ORGANIZATION}" ]]; then
         print_err "Environment variable ORGANIZATION should be set.";
@@ -138,6 +170,10 @@ check_service_cidr () {
 }
 
 check_inputs () {
+    set_cloud_instance_ca;
+    set_cloud_instance_api_server;
+    set_cloud_instance_user;
+    set_cloud_instance_oauth_token;
     set_organization;
     set_team;
     set_region;
