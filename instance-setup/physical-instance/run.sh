@@ -370,12 +370,12 @@ register_me () {
     CLIENT_KEY=$(yq '.users[] | select(.name == "default") | .user.client-key-data' $KUBECONFIG);
     
     echo $CLOUD_INSTANCE_CA | base64 --decode >> /tmp/ca.crt;
-    kubectl config set-cluster cloud-instance --server=$CLOUD_INSTANCE_API_SERVER --certificate-authority=/tmp/ca.crt --embed-certs=true;
-    kubectl config set-credentials $CLOUD_INSTANCE_USER --token=$CLOUD_INSTANCE_OAUTH_TOKEN;
-    kubectl config set-context $CLOUD_INSTANCE_USER --cluster=cloud-instance --user=$CLOUD_INSTANCE_USER;
-    kubectl config use-context $CLOUD_INSTANCE_USER;
+    kubectl config set-cluster cloud-instance --server=$CLOUD_INSTANCE_API_SERVER --certificate-authority=/tmp/ca.crt --embed-certs=true 2>/dev/null 1>/dev/null;
+    kubectl config set-credentials $CLOUD_INSTANCE_USER --token=$CLOUD_INSTANCE_OAUTH_TOKEN 2>/dev/null 1>/dev/null;
+    kubectl config set-context $CLOUD_INSTANCE_USER --cluster=cloud-instance --user=$CLOUD_INSTANCE_USER 2>/dev/null 1>/dev/null;
+    kubectl config use-context $CLOUD_INSTANCE_USER 2>/dev/null 1>/dev/null;
     sleep 2;
-    cat <<EOF | kubectl apply -f -
+    cat << EOF | kubectl apply -f -
 apiVersion: connection-hub.roboscale.io/v1alpha1
 kind: PhysicalInstance
 metadata:
@@ -386,12 +386,12 @@ spec:
     certificateAuthority: $CERT_AUTHORITY_DATA
     clientCertificate: $CLIENT_CERTIFICATE
     clientKey: $CLIENT_KEY
-EOF;
-    printf "\n";
+EOF
     print_log "Go to the platform and check if your physical instance $PHYSICAL_INSTANCE is connected to your cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
-    printf "Check your physical instance status by running the command below in your cloud instance:\n\n";
+    print_log "Check your physical instance status by running the command below in your cloud instance:\n\n";
+    printf "\n\n";
     printf "watch kubectl get physicalinstances";
-    printf "\n";
+    printf "\n\n";
 }
 
 print_global_log "Waiting for the preflight checks...";
