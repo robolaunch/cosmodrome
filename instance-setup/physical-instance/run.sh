@@ -44,6 +44,38 @@ set_cluster_root_domain () {
         | awk -F ' ' '{print $2}');
 }
 
+set_cloud_instance_ca () {
+    if [[ -z "${CLOUD_INSTANCE_CA}" ]]; then
+        print_err "Environment variable CLOUD_INSTANCE_CA should be set.";
+    else
+        CLOUD_INSTANCE_CA=$CLOUD_INSTANCE_CA;
+    fi
+}
+
+set_cloud_instance_api_server () {
+    if [[ -z "${CLOUD_INSTANCE_API_SERVER}" ]]; then
+        print_err "Environment variable CLOUD_INSTANCE_API_SERVER should be set.";
+    else
+        CLOUD_INSTANCE_API_SERVER=$CLOUD_INSTANCE_API_SERVER;
+    fi
+}
+
+set_cloud_instance_user () {
+    if [[ -z "${CLOUD_INSTANCE_USER}" ]]; then
+        print_err "Environment variable CLOUD_INSTANCE_USER should be set.";
+    else
+        CLOUD_INSTANCE_USER=$CLOUD_INSTANCE_USER;
+    fi
+}
+
+set_cloud_instance_oauth_token () {
+    if [[ -z "${CLOUD_INSTANCE_OAUTH_TOKEN}" ]]; then
+        print_err "Environment variable CLOUD_INSTANCE_OAUTH_TOKEN should be set.";
+    else
+        CLOUD_INSTANCE_OAUTH_TOKEN=$CLOUD_INSTANCE_OAUTH_TOKEN;
+    fi
+}
+
 set_organization () {
     if [[ -z "${ORGANIZATION}" ]]; then
         print_err "Environment variable ORGANIZATION should be set.";
@@ -138,6 +170,10 @@ check_service_cidr () {
 }
 
 check_inputs () {
+    set_cloud_instance_ca;
+    set_cloud_instance_api_server;
+    set_cloud_instance_user;
+    set_cloud_instance_oauth_token;
     set_organization;
     set_team;
     set_region;
@@ -326,15 +362,20 @@ check_cloud_instance_phase () {
     done
 }
 
-display_info () {
+register_me () {
     check_cluster;
     PHYSICAL_INSTANCE_API_SERVER_URL="https://"${PHYSICAL_INSTANCE_CLUSTER_CIDR%0/*}"1:6443"
     CERT_AUTHORITY_DATA=$(yq '.clusters[] | select(.name == "default") | .cluster.certificate-authority-data' $KUBECONFIG);
     CLIENT_CERTIFICATE=$(yq '.users[] | select(.name == "default") | .user.client-certificate-data' $KUBECONFIG);
     CLIENT_KEY=$(yq '.users[] | select(.name == "default") | .user.client-key-data' $KUBECONFIG);
-    printf "\n\n"
-    echo \
-"cat <<EOF | kubectl apply -f -
+    
+    echo $CLOUD_INSTANCE_CA | base64 --decode >> /tmp/ca.crt;
+    kubectl config set-cluster cloud-instance --server=$CLOUD_INSTANCE_API_SERVER --certificate-authority=/tmp/ca.crt --embed-certs=true 2>/dev/null 1>/dev/null;
+    kubectl config set-credentials $CLOUD_INSTANCE_USER --token=$CLOUD_INSTANCE_OAUTH_TOKEN 2>/dev/null 1>/dev/null;
+    kubectl config set-context $CLOUD_INSTANCE_USER --cluster=cloud-instance --user=$CLOUD_INSTANCE_USER 2>/dev/null 1>/dev/null;
+    kubectl config use-context $CLOUD_INSTANCE_USER 2>/dev/null 1>/dev/null;
+    sleep 2;
+    cat << EOF | kubectl apply -f -
 apiVersion: connection-hub.roboscale.io/v1alpha1
 kind: PhysicalInstance
 metadata:
@@ -345,10 +386,12 @@ spec:
     certificateAuthority: $CERT_AUTHORITY_DATA
     clientCertificate: $CLIENT_CERTIFICATE
     clientKey: $CLIENT_KEY
-EOF";
-    printf "\n";
-    print_log "Physical instance is connected to the cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
-    print_log "In order to complete registration of physical instance you should run the command above in cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+EOF
+    print_log "Go to the platform and check if your physical instance $PHYSICAL_INSTANCE is connected to your cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+    print_log "Check your physical instance status by running the command below in your cloud instance:\n\n";
+    printf "\n\n";
+    printf "watch kubectl get physicalinstances";
+    printf "\n\n";
 }
 
 print_global_log "Waiting for the preflight checks...";
@@ -399,4 +442,4 @@ print_global_log "Joining connection hub $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE..
 print_global_log "Checking connection status...";
 (check_cloud_instance_phase)
 
-display_info >&3
+register_me >&3
