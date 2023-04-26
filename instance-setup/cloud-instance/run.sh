@@ -12,6 +12,7 @@
 set -e;
 
 BLUE='\033[0;34m';
+GREEN='\033[0;32m\';
 RED='\033[0;31m';
 NC='\033[0m';
 
@@ -24,11 +25,11 @@ export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
 
 print_global_log () {
-    echo -e "${BLUE}$1${NC}" >&3;
+    echo -e "${GREEN}$1${NC}" >&3;
 }
 
 print_log () {
-    echo -e "${BLUE}$1${NC}";
+    echo -e "${GREEN}$1${NC}";
 }
 
 print_err () {
