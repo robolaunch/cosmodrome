@@ -200,6 +200,11 @@ opening () {
     printf "\n";
 }
 
+check_if_root () {
+    if [ $USER != "root" ]; then
+        print_err "You should switch to root using \"sudo -i\" before setup."
+    fi
+}
 
 install_pre_tools () {
     print_log "Installing Tools...";
@@ -395,6 +400,7 @@ EOF
 }
 
 print_global_log "Waiting for the preflight checks...";
+(check_if_root)
 (install_pre_tools)
 (get_versioning_map)
 
