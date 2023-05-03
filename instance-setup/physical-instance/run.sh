@@ -376,6 +376,7 @@ register_me () {
     CLIENT_CERTIFICATE=$(yq '.users[] | select(.name == "default") | .user.client-certificate-data' $KUBECONFIG);
     CLIENT_KEY=$(yq '.users[] | select(.name == "default") | .user.client-key-data' $KUBECONFIG);
     
+    # SKIP_PLATFORM is not set
     if [[ -z "${SKIP_PLATFORM}" ]]; then
         echo $CLOUD_INSTANCE_CA | base64 --decode >> /tmp/ca.crt;
         kubectl config set-cluster cloud-instance --server=$CLOUD_INSTANCE_API_SERVER --certificate-authority=/tmp/ca.crt --embed-certs=true 2>/dev/null 1>/dev/null;
@@ -400,8 +401,25 @@ EOF
         printf "\n\n";
         printf "watch kubectl get physicalinstances";
         printf "\n\n";
+    # SKIP_PLATFORM is set
     else
-        # show connection action
+        printf "\n\n"
+        echo \
+"cat <<EOF | kubectl apply -f -
+apiVersion: connection-hub.roboscale.io/v1alpha1
+kind: PhysicalInstance
+metadata:
+name: $PHYSICAL_INSTANCE
+spec:
+server: $PHYSICAL_INSTANCE_API_SERVER_URL
+credentials:
+    certificateAuthority: $CERT_AUTHORITY_DATA
+    clientCertificate: $CLIENT_CERTIFICATE
+    clientKey: $CLIENT_KEY
+EOF";
+        printf "\n";
+        print_log "Physical instance is connected to the cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+        print_log "In order to complete registration of physical instance you should run the command above in cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
     fi
 }
 
