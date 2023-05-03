@@ -388,10 +388,10 @@ register_me () {
 apiVersion: connection-hub.roboscale.io/v1alpha1
 kind: PhysicalInstance
 metadata:
-name: $PHYSICAL_INSTANCE
+  name: $PHYSICAL_INSTANCE
 spec:
-server: $PHYSICAL_INSTANCE_API_SERVER_URL
-credentials:
+  server: $PHYSICAL_INSTANCE_API_SERVER_URL
+  credentials:
     certificateAuthority: $CERT_AUTHORITY_DATA
     clientCertificate: $CLIENT_CERTIFICATE
     clientKey: $CLIENT_KEY
@@ -409,10 +409,10 @@ EOF
 apiVersion: connection-hub.roboscale.io/v1alpha1
 kind: PhysicalInstance
 metadata:
-name: $PHYSICAL_INSTANCE
+  name: $PHYSICAL_INSTANCE
 spec:
-server: $PHYSICAL_INSTANCE_API_SERVER_URL
-credentials:
+  server: $PHYSICAL_INSTANCE_API_SERVER_URL
+  credentials:
     certificateAuthority: $CERT_AUTHORITY_DATA
     clientCertificate: $CLIENT_CERTIFICATE
     clientKey: $CLIENT_KEY
