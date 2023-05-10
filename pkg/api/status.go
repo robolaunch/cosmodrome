@@ -12,9 +12,9 @@ const (
 )
 
 type StepStatus struct {
-	StepName string
-	Phase    StepPhase
-	Reason   string
+	Step   Step
+	Phase  StepPhase
+	Reason string
 }
 
 func NewStepStatus() *StepStatus {

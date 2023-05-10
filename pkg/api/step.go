@@ -19,3 +19,37 @@ func (step *Step) validate() error {
 	}
 	return nil
 }
+
+func (step *Step) start(status *LaunchStatus) error {
+	stepStatus := NewStepStatus()
+	stepStatus.Step = *step
+
+	// if it's the first step
+	if step.RootImage != "" {
+		// process first step
+	} else {
+		// process step
+	}
+
+	return nil
+}
+
+func (step *Step) build(baseImage, stepStatus *StepStatus) error {
+
+	stepStatus.Phase = StepPhaseBuilding
+
+	// building jobs
+	// ***
+
+	return nil
+}
+
+func (step *Step) push(stepStatus *StepStatus) error {
+
+	stepStatus.Phase = StepPhasePushing
+
+	// pushing jobs
+	// ***
+
+	return nil
+}
