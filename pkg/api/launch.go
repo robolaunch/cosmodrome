@@ -43,7 +43,7 @@ func (lc *LaunchConfig) Validate() error {
 
 func (lc *LaunchConfig) validateSteps() error {
 	for _, step := range lc.Steps {
-		if err := step.Validate(); err != nil {
+		if err := step.validate(); err != nil {
 			return err
 		}
 	}

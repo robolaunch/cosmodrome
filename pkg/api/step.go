@@ -13,7 +13,7 @@ type Step struct {
 	Push      bool              `yaml:"push"`
 }
 
-func (step *Step) Validate() error {
+func (step *Step) validate() error {
 	if reflect.DeepEqual(step.Name, "") {
 		return errors.New(".steps[].name cannot be empty")
 	}
