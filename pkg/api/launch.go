@@ -27,7 +27,7 @@ func (lc *LaunchConfig) PrintYAML() error {
 
 func (lc *LaunchConfig) Default() {
 	for k := range lc.Steps {
-		lc.Steps[k].setImageName(*lc)
+		lc.Steps[k].Default(*lc)
 	}
 }
 
@@ -48,8 +48,8 @@ func (lc *LaunchConfig) Validate() error {
 }
 
 func (lc *LaunchConfig) validateSteps() error {
-	for _, step := range lc.Steps {
-		if err := step.validate(); err != nil {
+	for k, step := range lc.Steps {
+		if err := step.validate(k); err != nil {
 			return err
 		}
 	}

@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"reflect"
+	"strconv"
 )
 
 type Image struct {
@@ -19,56 +20,41 @@ type Step struct {
 	Push      bool              `yaml:"push"`
 }
 
-func (step *Step) validate() error {
-	if reflect.DeepEqual(step.Name, "") {
-		return errors.New(".steps[].name cannot be empty")
-	}
-	if reflect.DeepEqual(step.Image.Repository, "") {
-		return errors.New(".steps[].image.repository cannot be empty")
-	}
-	if reflect.DeepEqual(step.Image.Tag, "") {
-		return errors.New(".steps[].image.tag cannot be empty")
-	}
-	if reflect.DeepEqual(step.Image.Name, "") {
-		return errors.New(".steps[].image.name cannot be empty")
-	}
-	return nil
+func (step *Step) Default(lc LaunchConfig) {
+	step.setImageName(lc)
 }
 
 func (step *Step) setImageName(lc LaunchConfig) {
 	step.Image.Name = lc.Registry + "/" + lc.Organization + "/" + step.Image.Repository + ":" + step.Image.Tag
 }
 
-func (step *Step) start(status *LaunchStatus) error {
-	stepStatus := NewStepStatus()
-	stepStatus.Step = *step
+func (step *Step) validate(key int) error {
+	if reflect.DeepEqual(step.Name, "") {
+		return errors.New(".steps[" + strconv.Itoa(key) + "].name cannot be empty")
+	}
+	if reflect.DeepEqual(step.Image.Repository, "") {
+		return errors.New(".steps[" + strconv.Itoa(key) + "].image.repository cannot be empty")
+	}
+	if reflect.DeepEqual(step.Image.Tag, "") {
+		return errors.New(".steps[" + strconv.Itoa(key) + "].image.tag cannot be empty")
+	}
+	if reflect.DeepEqual(step.Image.Name, "") {
+		return errors.New(".steps[" + strconv.Itoa(key) + "].image.name cannot be empty")
+	}
+	return nil
+}
 
-	// if it's the first step
-	if step.BaseStep == "" {
-		// process first step
-	} else {
-		// process step
+func (step *Step) getBaseStep(lc LaunchConfig) (Step, error) {
+
+	if reflect.DeepEqual(step.BaseStep, "") {
+		return Step{}, nil
 	}
 
-	return nil
-}
+	for _, s := range lc.Steps {
+		if s.Name == step.BaseStep {
+			return s, nil
+		}
+	}
 
-func (step *Step) build(baseImage, stepStatus *StepStatus) error {
-
-	stepStatus.Phase = StepPhaseBuilding
-
-	// building jobs
-	// ***
-
-	return nil
-}
-
-func (step *Step) push(stepStatus *StepStatus) error {
-
-	stepStatus.Phase = StepPhasePushing
-
-	// pushing jobs
-	// ***
-
-	return nil
+	return Step{}, errors.New("cannot find base step of " + step.Name)
 }
