@@ -36,6 +36,9 @@ var launchCmd = &cobra.Command{
 			fmt.Printf("unable to decode into config struct, %v", err)
 		}
 
+		// default fields
+		launchCfg.Default()
+
 		// validate launch config
 		if err := launchCfg.Validate(); err != nil {
 			Error.Println(err.Error())

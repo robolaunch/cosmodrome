@@ -25,6 +25,12 @@ func (lc *LaunchConfig) PrintYAML() error {
 	return nil
 }
 
+func (lc *LaunchConfig) Default() {
+	for k := range lc.Steps {
+		lc.Steps[k].setImageName(*lc)
+	}
+}
+
 func (lc *LaunchConfig) Validate() error {
 	if reflect.DeepEqual(len(lc.Steps), 0) {
 		return errors.New(".steps should contain at least one step")
@@ -57,10 +63,6 @@ func (lc *LaunchConfig) validateSteps() error {
 func (lc *LaunchConfig) validateStepsSemantics() error {
 	if !reflect.DeepEqual(lc.Steps[0].BaseStep, "") {
 		return errors.New(".steps[0].baseStep should be empty")
-	}
-
-	if reflect.DeepEqual(lc.Steps[0].RootImage, "") {
-		return errors.New(".steps[0].rootImage cannot not be empty")
 	}
 
 	for i, step := range lc.Steps[1:] {
