@@ -22,9 +22,16 @@ var launchCmd = &cobra.Command{
 	Long:  `A longer description for launch.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		// check if config will be printed out
+		printConfig, err := cmd.Flags().GetBool("print")
+		if err != nil {
+			Error.Println(err.Error())
+			os.Exit(2)
+		}
+
 		// get launch config and convert it to struct
 		launchCfg := &api.LaunchConfig{}
-		err := viper.Unmarshal(launchCfg)
+		err = viper.Unmarshal(launchCfg)
 		if err != nil {
 			fmt.Printf("unable to decode into config struct, %v", err)
 		}
@@ -35,6 +42,9 @@ var launchCmd = &cobra.Command{
 			os.Exit(2)
 		}
 
+		if printConfig {
+			launchCfg.PrintYAML()
+		}
 	},
 }
 
@@ -49,5 +59,5 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// launchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	launchCmd.Flags().BoolP("print", "p", false, "Print launch configuration.")
 }

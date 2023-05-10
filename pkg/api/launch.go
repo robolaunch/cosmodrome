@@ -2,7 +2,11 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
+	"strconv"
+
+	"gopkg.in/yaml.v3"
 )
 
 type LaunchConfig struct {
@@ -11,20 +15,57 @@ type LaunchConfig struct {
 }
 
 type Step struct {
-	Name      string            `yaml:"name,omitempty"`
-	Root      bool              `yaml:"root,omitempty"`
-	BaseStep  string            `yaml:"baseStep,omitempty"`
-	BuildArgs map[string]string `yaml:"buildArgs,omitempty"`
-	Push      bool              `yaml:"push,omitempty"`
+	Name      string            `yaml:"name"`
+	RootImage string            `yaml:"rootImage"`
+	BaseStep  string            `yaml:"baseStep"`
+	BuildArgs map[string]string `yaml:"buildArgs"`
+	Push      bool              `yaml:"push"`
+}
+
+func (lc *LaunchConfig) PrintYAML() error {
+	yamlData, err := yaml.Marshal(lc)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(yamlData))
+	return nil
 }
 
 func (lc *LaunchConfig) Validate() error {
 	if reflect.DeepEqual(len(lc.Steps), 0) {
 		return errors.New("launch config should contain at least one step")
 	}
+	if err := lc.validateSteps(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (lc *LaunchConfig) validateSteps() error {
 	for _, step := range lc.Steps {
 		if err := step.Validate(); err != nil {
 			return err
+		}
+	}
+
+	if err := lc.validateStepsSemantics(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (lc *LaunchConfig) validateStepsSemantics() error {
+	if !reflect.DeepEqual(lc.Steps[0].BaseStep, "") {
+		return errors.New(".steps[0].baseStep should be empty")
+	}
+
+	if reflect.DeepEqual(lc.Steps[0].RootImage, "") {
+		return errors.New(".steps[0].rootImage cannot not be empty")
+	}
+
+	for i, step := range lc.Steps[1:] {
+		if reflect.DeepEqual(step.BaseStep, "") {
+			return errors.New(".steps[" + strconv.Itoa(i+1) + "].baseStep should not be empty")
 		}
 	}
 	return nil
