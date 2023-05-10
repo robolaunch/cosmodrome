@@ -45,10 +45,12 @@ var launchCmd = &cobra.Command{
 			os.Exit(2)
 		}
 
+		// print launch config
 		if printConfig {
 			launchCfg.PrintYAML()
 		}
 
+		// process launch
 		if err := launchCfg.Start(); err != nil {
 			Error.Println(err.Error())
 			os.Exit(1)

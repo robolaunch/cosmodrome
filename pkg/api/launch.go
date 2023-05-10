@@ -70,5 +70,6 @@ func (lc *LaunchConfig) validateStepsSemantics() error {
 			return errors.New(".steps[" + strconv.Itoa(i+1) + "].baseStep cannot be empty")
 		}
 	}
+
 	return nil
 }
