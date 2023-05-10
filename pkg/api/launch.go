@@ -10,8 +10,10 @@ import (
 )
 
 type LaunchConfig struct {
-	Name  string `yaml:"name,omitempty"`
-	Steps []Step `yaml:"steps,omitempty"`
+	Name         string `yaml:"name,omitempty"`
+	Registry     string `yaml:"registry,omitempty"`
+	Organization string `yaml:"organization,omitempty"`
+	Steps        []Step `yaml:"steps,omitempty"`
 }
 
 type Step struct {
@@ -33,7 +35,13 @@ func (lc *LaunchConfig) PrintYAML() error {
 
 func (lc *LaunchConfig) Validate() error {
 	if reflect.DeepEqual(len(lc.Steps), 0) {
-		return errors.New("launch config should contain at least one step")
+		return errors.New(".steps should contain at least one step")
+	}
+	if reflect.DeepEqual(lc.Registry, "") {
+		return errors.New(".registry cannot be empty")
+	}
+	if reflect.DeepEqual(lc.Organization, "") {
+		return errors.New(".organization cannot be empty")
 	}
 	if err := lc.validateSteps(); err != nil {
 		return err
@@ -65,7 +73,7 @@ func (lc *LaunchConfig) validateStepsSemantics() error {
 
 	for i, step := range lc.Steps[1:] {
 		if reflect.DeepEqual(step.BaseStep, "") {
-			return errors.New(".steps[" + strconv.Itoa(i+1) + "].baseStep should not be empty")
+			return errors.New(".steps[" + strconv.Itoa(i+1) + "].baseStep cannot be empty")
 		}
 	}
 	return nil
