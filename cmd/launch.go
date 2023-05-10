@@ -48,6 +48,11 @@ var launchCmd = &cobra.Command{
 		if printConfig {
 			launchCfg.PrintYAML()
 		}
+
+		if err := launchCfg.Start(); err != nil {
+			Error.Println(err.Error())
+			os.Exit(1)
+		}
 	},
 }
 
