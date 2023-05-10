@@ -1,27 +1,40 @@
 /*
 Copyright © 2023 robolaunch
-
 */
 package cmd
 
 import (
 	"fmt"
+	"log"
+	"os"
 
+	"github.com/robolaunch/cosmodrome/pkg/api"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+var Error = log.New(os.Stdout, "\u001b[31mERROR: \u001b[0m", log.LstdFlags|log.Lshortfile)
 
 // launchCmd represents the launch command
 var launchCmd = &cobra.Command{
 	Use:   "launch",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Launch verb starts building components.",
+	Long:  `A longer description for launch.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("launch called")
+
+		// get launch config and convert it to struct
+		launchCfg := &api.LaunchConfig{}
+		err := viper.Unmarshal(launchCfg)
+		if err != nil {
+			fmt.Printf("unable to decode into config struct, %v", err)
+		}
+
+		// validate launch config
+		if err := launchCfg.Validate(); err != nil {
+			Error.Println(err.Error())
+			os.Exit(2)
+		}
+
 	},
 }
 

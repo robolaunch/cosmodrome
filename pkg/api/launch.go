@@ -22,6 +22,11 @@ func (lc *LaunchConfig) Validate() error {
 	if reflect.DeepEqual(len(lc.Steps), 0) {
 		return errors.New("launch config should contain at least one step")
 	}
+	for _, step := range lc.Steps {
+		if err := step.Validate(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
