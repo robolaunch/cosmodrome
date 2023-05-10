@@ -16,14 +16,6 @@ type LaunchConfig struct {
 	Steps        []Step `yaml:"steps,omitempty"`
 }
 
-type Step struct {
-	Name      string            `yaml:"name"`
-	RootImage string            `yaml:"rootImage"`
-	BaseStep  string            `yaml:"baseStep"`
-	BuildArgs map[string]string `yaml:"buildArgs"`
-	Push      bool              `yaml:"push"`
-}
-
 func (lc *LaunchConfig) PrintYAML() error {
 	yamlData, err := yaml.Marshal(lc)
 	if err != nil {
@@ -75,13 +67,6 @@ func (lc *LaunchConfig) validateStepsSemantics() error {
 		if reflect.DeepEqual(step.BaseStep, "") {
 			return errors.New(".steps[" + strconv.Itoa(i+1) + "].baseStep cannot be empty")
 		}
-	}
-	return nil
-}
-
-func (step *Step) Validate() error {
-	if reflect.DeepEqual(step.Name, "") {
-		return errors.New(".steps[].name cannot be empty")
 	}
 	return nil
 }
