@@ -44,7 +44,7 @@ func (step *Step) validate(key int) error {
 	return nil
 }
 
-func (step *Step) getBaseStep(lc LaunchConfig) (Step, error) {
+func (step *Step) GetBaseStep(lc LaunchConfig) (Step, error) {
 
 	if reflect.DeepEqual(step.BaseStep, "") {
 		return Step{}, nil
