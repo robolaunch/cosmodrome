@@ -13,12 +13,12 @@ type Image struct {
 }
 
 type Step struct {
-	Name       string            `yaml:"name"`
-	Image      Image             `yaml:"image"`
-	Dockerfile string            `yaml:"dockerfile"`
-	BaseStep   string            `yaml:"baseStep"`
-	BuildArgs  map[string]string `yaml:"buildArgs"`
-	Push       bool              `yaml:"push"`
+	Name       string             `yaml:"name"`
+	Image      Image              `yaml:"image"`
+	Dockerfile string             `yaml:"dockerfile"`
+	BaseStep   string             `yaml:"baseStep"`
+	BuildArgs  map[string]*string `yaml:"buildArgs"`
+	Push       bool               `yaml:"push"`
 }
 
 func (step *Step) Default(lc LaunchConfig) {

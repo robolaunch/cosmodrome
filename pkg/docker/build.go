@@ -6,6 +6,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -46,6 +47,12 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
 	buildArgs := make(map[string]*string)
+
+	// make all keys upper case
+	for k, v := range step.BuildArgs {
+		buildArgs[strings.ToUpper(k)] = v
+	}
+
 	if baseImage != "" {
 		buildArgs["BASE_IMAGE"] = &baseImage
 	}
