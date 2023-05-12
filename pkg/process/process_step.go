@@ -36,7 +36,7 @@ func build(step *api.Step, baseStep api.Step, stepStatus *api.StepStatus) error 
 
 	// building jobs
 	StepLog.Println("Building step: " + step.Name)
-	docker.Build(context.Background(), "Dockerfile", "test.local/Dockerfile", baseStep.Image.Name, *step)
+	docker.Build(context.Background(), "Dockerfile", step.Dockerfile, baseStep.Image.Name, *step)
 	// ***
 
 	return nil

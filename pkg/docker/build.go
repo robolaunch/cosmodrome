@@ -46,6 +46,11 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
+	buildArgs := make(map[string]*string)
+	if baseImage != "" {
+		buildArgs["BASE_IMAGE"] = &baseImage
+	}
+
 	imageBuildResponse, err := cli.ImageBuild(
 		ctx,
 		dockerFileTarReader,
@@ -54,9 +59,7 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 			Dockerfile: dfName,
 			Remove:     true,
 			Tags:       []string{step.Image.Name},
-			BuildArgs: map[string]*string{
-				"BASE_IMAGE": &baseImage,
-			},
+			BuildArgs:  buildArgs,
 		},
 	)
 
