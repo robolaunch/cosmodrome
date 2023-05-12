@@ -61,13 +61,34 @@ func (lc *LaunchConfig) validateSteps() error {
 }
 
 func (lc *LaunchConfig) validateStepsSemantics() error {
+	// check if base step is disabled for first step
 	if !reflect.DeepEqual(lc.Steps[0].BaseStep, "") {
 		return errors.New(".steps[0].baseStep should be empty")
 	}
 
+	// check if base step is populated
 	for i, step := range lc.Steps[1:] {
 		if reflect.DeepEqual(step.BaseStep, "") {
 			return errors.New(".steps[" + strconv.Itoa(i+1) + "].baseStep cannot be empty")
+		}
+	}
+
+	// check if base step really exists
+	for i := range lc.Steps {
+		if i == 0 {
+			continue
+		} else {
+			hasBaseStep := false
+			for j := 0; j < i; j++ {
+				if lc.Steps[i].BaseStep == lc.Steps[j].Name {
+					hasBaseStep = true
+					break
+				}
+			}
+
+			if !hasBaseStep {
+				return errors.New(".steps[" + strconv.Itoa(i) + "].baseStep is invalid. no step named `" + lc.Steps[i].BaseStep + "` is found before the step `" + lc.Steps[i].Name + "`.")
+			}
 		}
 	}
 
