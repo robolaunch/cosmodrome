@@ -7,24 +7,27 @@ import (
 	"github.com/robolaunch/cosmodrome/pkg/docker"
 )
 
-func start(step *api.Step, lc api.LaunchConfig, status *api.LaunchStatus) error {
+func start(step *api.Step, status *api.StepStatus, lc api.LaunchConfig) error {
 
-	stepStatus := api.NewStepStatus()
-	stepStatus.Step = *step
+	status.Step = *step
 
 	baseStep, err := step.GetBaseStep(lc)
 	if err != nil {
 		return err
 	}
 
-	if err := build(step, baseStep, stepStatus); err != nil {
+	if err := build(step, baseStep, status); err != nil {
+		status.Phase = api.StepPhaseFailed
 		return err
 	}
 	if step.Push {
-		if err := push(step, stepStatus, lc); err != nil {
+		if err := push(step, status, lc); err != nil {
+			status.Phase = api.StepPhaseFailed
 			return err
 		}
 	}
+
+	status.Phase = api.StepPhaseSucceeded
 
 	return nil
 }
