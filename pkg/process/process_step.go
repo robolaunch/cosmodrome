@@ -2,7 +2,6 @@ package process
 
 import (
 	"context"
-	"time"
 
 	"github.com/robolaunch/cosmodrome/pkg/api"
 	"github.com/robolaunch/cosmodrome/pkg/docker"
@@ -22,7 +21,7 @@ func start(step *api.Step, lc api.LaunchConfig, status *api.LaunchStatus) error 
 		return err
 	}
 	if step.Push {
-		if err := push(step, stepStatus); err != nil {
+		if err := push(step, stepStatus, lc); err != nil {
 			return err
 		}
 	}
@@ -34,22 +33,22 @@ func build(step *api.Step, baseStep api.Step, stepStatus *api.StepStatus) error 
 
 	stepStatus.Phase = api.StepPhaseBuilding
 
-	// building jobs
 	StepLog.Println("Building step: " + step.Name)
-	docker.Build(context.Background(), "Dockerfile", step.Dockerfile, baseStep.Image.Name, *step)
-	// ***
+	if err := docker.Build(context.Background(), "Dockerfile", step.Dockerfile, baseStep.Image.Name, *step); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func push(step *api.Step, stepStatus *api.StepStatus) error {
+func push(step *api.Step, stepStatus *api.StepStatus, lc api.LaunchConfig) error {
 
 	stepStatus.Phase = api.StepPhasePushing
 
-	// pushing jobs
 	StepLog.Println("Pushing step: " + step.Name)
-	time.Sleep(time.Second * 1)
-	// ***
+	if err := docker.Push(context.Background(), *step, lc); err != nil {
+		return err
+	}
 
 	return nil
 }
