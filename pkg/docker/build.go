@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"os"
 
@@ -16,7 +15,7 @@ import (
 func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		return errors.New("unable to init client")
+		return err
 	}
 
 	buf := new(bytes.Buffer)
@@ -25,11 +24,11 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 
 	dockerFileReader, err := os.Open(dfPath)
 	if err != nil {
-		return errors.New("unable to open Dockerfile")
+		return err
 	}
 	readDockerFile, err := io.ReadAll(dockerFileReader)
 	if err != nil {
-		return errors.New("unable to read dockerfile")
+		return err
 	}
 
 	tarHeader := &tar.Header{
@@ -38,11 +37,11 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 	}
 	err = tw.WriteHeader(tarHeader)
 	if err != nil {
-		return errors.New("unable to write tar header")
+		return err
 	}
 	_, err = tw.Write(readDockerFile)
 	if err != nil {
-		return errors.New("unable to write tar body")
+		return err
 	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
@@ -64,14 +63,14 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 	)
 
 	if err != nil {
-		return errors.New("unable to build docker image")
+		return err
 	}
 
 	defer imageBuildResponse.Body.Close()
 
 	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
 	if err != nil {
-		return errors.New("unable to read image build response")
+		return err
 	}
 
 	return nil
