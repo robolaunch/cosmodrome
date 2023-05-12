@@ -13,11 +13,12 @@ type Image struct {
 }
 
 type Step struct {
-	Name      string            `yaml:"name"`
-	Image     Image             `yaml:"image"`
-	BaseStep  string            `yaml:"baseStep"`
-	BuildArgs map[string]string `yaml:"buildArgs"`
-	Push      bool              `yaml:"push"`
+	Name       string            `yaml:"name"`
+	Image      Image             `yaml:"image"`
+	Dockerfile string            `yaml:"dockerfile"`
+	BaseStep   string            `yaml:"baseStep"`
+	BuildArgs  map[string]string `yaml:"buildArgs"`
+	Push       bool              `yaml:"push"`
 }
 
 func (step *Step) Default(lc LaunchConfig) {
@@ -32,6 +33,9 @@ func (step *Step) validate(key int) error {
 	if reflect.DeepEqual(step.Name, "") {
 		return errors.New(".steps[" + strconv.Itoa(key) + "].name cannot be empty")
 	}
+	if reflect.DeepEqual(step.Dockerfile, "") {
+		return errors.New(".steps[" + strconv.Itoa(key) + "].dockerfile cannot be empty")
+	}
 	if reflect.DeepEqual(step.Image.Repository, "") {
 		return errors.New(".steps[" + strconv.Itoa(key) + "].image.repository cannot be empty")
 	}
@@ -44,7 +48,7 @@ func (step *Step) validate(key int) error {
 	return nil
 }
 
-func (step *Step) getBaseStep(lc LaunchConfig) (Step, error) {
+func (step *Step) GetBaseStep(lc LaunchConfig) (Step, error) {
 
 	if reflect.DeepEqual(step.BaseStep, "") {
 		return Step{}, nil

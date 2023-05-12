@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/robolaunch/cosmodrome/pkg/api"
+	"github.com/robolaunch/cosmodrome/pkg/process"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -51,7 +52,7 @@ var launchCmd = &cobra.Command{
 		}
 
 		// process launch
-		if err := launchCfg.Start(); err != nil {
+		if err := process.Start(launchCfg); err != nil {
 			Error.Println(err.Error())
 			os.Exit(1)
 		}
