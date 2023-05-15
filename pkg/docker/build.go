@@ -10,6 +10,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
 	"github.com/robolaunch/cosmodrome/pkg/api"
 )
 
@@ -23,28 +24,12 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
 
-	dockerFileReader, err := os.Open(dfPath)
-	if err != nil {
-		return err
-	}
-	readDockerFile, err := io.ReadAll(dockerFileReader)
-	if err != nil {
-		return err
-	}
-
-	tarHeader := &tar.Header{
-		Name: dfName,
-		Size: int64(len(readDockerFile)),
-	}
-	err = tw.WriteHeader(tarHeader)
-	if err != nil {
-		return err
-	}
-	_, err = tw.Write(readDockerFile)
-	if err != nil {
-		return err
-	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
+
+	tar, err := archive.TarWithOptions(dfPath, &archive.TarOptions{})
+	if err != nil {
+		return err
+	}
 
 	buildArgs := make(map[string]*string)
 
@@ -59,7 +44,7 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 
 	imageBuildResponse, err := cli.ImageBuild(
 		ctx,
-		dockerFileTarReader,
+		tar,
 		types.ImageBuildOptions{
 			Context:    dockerFileTarReader,
 			Dockerfile: dfName,

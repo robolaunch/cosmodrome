@@ -37,7 +37,7 @@ func build(step *api.Step, baseStep api.Step, stepStatus *api.StepStatus) error 
 	stepStatus.Phase = api.StepPhaseBuilding
 
 	StepLog.Println("Building step: " + step.Name)
-	if err := docker.Build(context.Background(), "Dockerfile", step.Dockerfile, baseStep.Image.Name, *step); err != nil {
+	if err := docker.Build(context.Background(), step.Dockerfile, step.Path, baseStep.Image.Name, *step); err != nil {
 		return err
 	}
 
