@@ -16,7 +16,7 @@ func start(step *api.Step, status *api.StepStatus, lc api.LaunchConfig) error {
 		return err
 	}
 
-	if err := build(step, baseStep, status); err != nil {
+	if err := build(step, baseStep, status, lc); err != nil {
 		status.Phase = api.StepPhaseFailed
 		return err
 	}
@@ -32,12 +32,12 @@ func start(step *api.Step, status *api.StepStatus, lc api.LaunchConfig) error {
 	return nil
 }
 
-func build(step *api.Step, baseStep api.Step, stepStatus *api.StepStatus) error {
+func build(step *api.Step, baseStep api.Step, stepStatus *api.StepStatus, lc api.LaunchConfig) error {
 
 	stepStatus.Phase = api.StepPhaseBuilding
 
 	StepLog.Println("Building step: " + step.Name)
-	if err := docker.Build(context.Background(), step.Dockerfile, step.Path, baseStep.Image.Name, *step); err != nil {
+	if err := docker.Build(context.Background(), step.Dockerfile, step.Path, baseStep.Image.Name, *step, lc); err != nil {
 		return err
 	}
 

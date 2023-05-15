@@ -14,6 +14,8 @@ type LaunchConfig struct {
 	Registry     string `yaml:"registry,omitempty"`
 	Organization string `yaml:"organization,omitempty"`
 	Steps        []Step `yaml:"steps,omitempty"`
+	Logfile      string `yaml:"logfile,omitempty"`
+	Verbose      bool   `yaml:"verbose,omitempty"`
 }
 
 func (lc *LaunchConfig) PrintYAML() error {

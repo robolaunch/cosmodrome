@@ -14,7 +14,7 @@ import (
 	"github.com/robolaunch/cosmodrome/pkg/api"
 )
 
-func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step) error {
+func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step, lc api.LaunchConfig) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return err
@@ -60,9 +60,21 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step)
 
 	defer imageBuildResponse.Body.Close()
 
-	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
-	if err != nil {
-		return err
+	if lc.Verbose {
+		_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
+		if err != nil {
+			return err
+		}
+	} else {
+		f, err := os.Create(lc.Logfile)
+		if err != nil {
+			return err
+		}
+
+		_, err = io.Copy(f, imageBuildResponse.Body)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

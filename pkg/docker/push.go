@@ -39,8 +39,11 @@ func Push(ctx context.Context, step api.Step, lc api.LaunchConfig) error {
 	}
 
 	defer imagePushResponse.Close()
-
-	_, err = io.Copy(os.Stdout, imagePushResponse)
+	f, err := os.Create("/tmp/dat2")
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(f, imagePushResponse)
 	if err != nil {
 		return err
 	}
