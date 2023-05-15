@@ -17,7 +17,7 @@ func Start(lc *api.LaunchConfig) error {
 			status.StepStatuses = append(status.StepStatuses, *stepStatus)
 			return err
 		}
-		emoji.Println(SuccessLog.Sprint(":whale: is generated."))
+		emoji.Println(SuccessLog.Sprint(":whale: " + lc.Steps[k].Image.Name + " is generated."))
 		status.StepStatuses = append(status.StepStatuses, *stepStatus)
 	}
 
