@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"io"
 	"os"
 
@@ -46,14 +47,28 @@ func Push(ctx context.Context, step api.Step, lc api.LaunchConfig) error {
 			return err
 		}
 	} else {
-		f, err := os.Create(lc.Logfile)
-		if err != nil {
-			return err
+		var f *os.File
+		if _, err := os.Stat("out_" + lc.Logfile); errors.Is(err, os.ErrNotExist) {
+			err := os.Mkdir("out_"+lc.Logfile, os.ModePerm)
+			if err != nil {
+				return err
+			}
+			f, err = os.Create("out_" + lc.Logfile + "/out_" + step.Name + "_push_" + lc.Logfile)
+			if err != nil {
+				return err
+			}
+		} else {
+			f, err = os.Create("out_" + lc.Logfile + "/out_" + step.Name + "_push_" + lc.Logfile)
+			if err != nil {
+				return err
+			}
 		}
+
 		_, err = io.Copy(f, imagePushResponse)
 		if err != nil {
 			return err
 		}
+
 	}
 
 	return nil

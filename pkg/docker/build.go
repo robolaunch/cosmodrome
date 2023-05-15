@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"os"
 	"strings"
@@ -67,10 +68,23 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step,
 			return err
 		}
 	} else {
-		f, err := os.Create("out_" + strings.ReplaceAll(step.Name, "-", "_") + "_" + lc.Logfile)
-		if err != nil {
-			return err
+		var f *os.File
+		if _, err := os.Stat("out_" + lc.Logfile); errors.Is(err, os.ErrNotExist) {
+			err := os.Mkdir("out_"+lc.Logfile, os.ModePerm)
+			if err != nil {
+				return err
+			}
+			f, err = os.Create("out_" + lc.Logfile + "/out_" + step.Name + "_build_" + lc.Logfile)
+			if err != nil {
+				return err
+			}
+		} else {
+			f, err = os.Create("out_" + lc.Logfile + "/out_" + step.Name + "_build_" + lc.Logfile)
+			if err != nil {
+				return err
+			}
 		}
+
 		_, err = io.Copy(f, imageBuildResponse.Body)
 		if err != nil {
 			return err
