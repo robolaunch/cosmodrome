@@ -67,7 +67,7 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step,
 			return err
 		}
 	} else {
-		f, err := os.Create(lc.Logfile)
+		f, err := os.Create("out_" + strings.ReplaceAll(step.Name, "-", "_") + "_" + lc.Logfile)
 		if err != nil {
 			return err
 		}

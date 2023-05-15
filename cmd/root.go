@@ -53,8 +53,8 @@ func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	launchCmd.PersistentFlags().BoolP("verbose", "v", false, "show more detailed output")
-	launchCmd.PersistentFlags().StringP("logfile", "l", "out_"+strconv.FormatInt(time.Now().Unix(), 10)+".log", "logfile")
-	viper.SetDefault("logfile", "out_"+strconv.FormatInt(time.Now().Unix(), 10)+".log")
+	launchCmd.PersistentFlags().StringP("logfile", "l", "out_step_"+strconv.FormatInt(time.Now().Unix(), 10)+".log", "logfile")
+	viper.SetDefault("logfile", strconv.FormatInt(time.Now().Unix(), 10)+".log")
 }
 
 // initConfig reads in config file and ENV variables if set.
