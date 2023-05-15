@@ -24,7 +24,7 @@ func Start(lc *api.LaunchConfig) error {
 		if lc.Steps[k].Push {
 			emoji.Println(SuccessLog.Sprint(" and pushed"))
 		}
-		emoji.Println(SuccessLog.Sprint("."))
+		emoji.Print(SuccessLog.Sprint("."))
 	}
 
 	fmt.Println()
