@@ -39,13 +39,21 @@ func Push(ctx context.Context, step api.Step, lc api.LaunchConfig) error {
 	}
 
 	defer imagePushResponse.Close()
-	f, err := os.Create("/tmp/dat2")
-	if err != nil {
-		return err
-	}
-	_, err = io.Copy(f, imagePushResponse)
-	if err != nil {
-		return err
+
+	if lc.Verbose {
+		_, err = io.Copy(os.Stdout, imagePushResponse)
+		if err != nil {
+			return err
+		}
+	} else {
+		f, err := os.Create(lc.Logfile)
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(f, imagePushResponse)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

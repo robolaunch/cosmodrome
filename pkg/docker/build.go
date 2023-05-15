@@ -70,7 +70,6 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step,
 		if err != nil {
 			return err
 		}
-
 		_, err = io.Copy(f, imageBuildResponse.Body)
 		if err != nil {
 			return err
