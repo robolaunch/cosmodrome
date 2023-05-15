@@ -20,8 +20,8 @@ func Push(ctx context.Context, step api.Step, lc api.LaunchConfig) error {
 
 	var authConfig = types.AuthConfig{
 		Username:      lc.Organization,
-		Password:      "<PERSONAL-ACCESS-TOKEN>",
-		ServerAddress: "<REGISTRY-SERVER-ADDRESS>", // https://index.docker.io/v1/
+		Password:      os.Getenv("REGISTRY_PAT"),
+		ServerAddress: lc.Registry, // https://index.docker.io/v1/
 	}
 	authConfigBytes, _ := json.Marshal(authConfig)
 	authConfigEncoded := base64.URLEncoding.EncodeToString(authConfigBytes)
