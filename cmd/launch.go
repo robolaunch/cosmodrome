@@ -60,6 +60,6 @@ var launchCmd = &cobra.Command{
 }
 
 func init() {
-	launchCmd.PersistentFlags().BoolP("no-cache", "nc", false, "use `--no-cache` flag when building an image")
+	launchCmd.PersistentFlags().Bool("no-cache", false, "images will be fetched from remote repositories")
 	rootCmd.AddCommand(launchCmd)
 }
