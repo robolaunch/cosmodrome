@@ -24,7 +24,7 @@ var launchCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// check if config will be printed out
-		printConfig, err := cmd.Flags().GetBool("print")
+		printConfig, err := cmd.Flags().GetBool("verbose")
 		if err != nil {
 			Error.Println(err.Error())
 			os.Exit(2)
@@ -61,14 +61,4 @@ var launchCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(launchCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// launchCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	launchCmd.Flags().BoolP("print", "p", false, "Print launch configuration.")
 }
