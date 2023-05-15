@@ -22,9 +22,9 @@ func Start(lc *api.LaunchConfig) error {
 
 		emoji.Println(SuccessLog.Sprint(":whale: " + lc.Steps[k].Image.Name + " is generated"))
 		if lc.Steps[k].Push {
-			emoji.Println(SuccessLog.Sprint(" and pushed"))
+			SuccessLog.Print(" and pushed")
 		}
-		emoji.Print(SuccessLog.Sprint("."))
+		SuccessLog.Print(".")
 	}
 
 	fmt.Println()
