@@ -16,6 +16,7 @@ type LaunchConfig struct {
 	Steps        []Step `yaml:"steps,omitempty"`
 	Logfile      string `yaml:"logfile,omitempty"`
 	Verbose      bool   `yaml:"verbose,omitempty"`
+	NoCache      bool   `yaml:"nocache,omitempty"`
 }
 
 func (lc *LaunchConfig) PrintYAML() error {

@@ -51,6 +51,7 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step,
 			Remove:     true,
 			Tags:       []string{step.Image.Name},
 			BuildArgs:  buildArgs,
+			NoCache:    lc.NoCache,
 		},
 	)
 
