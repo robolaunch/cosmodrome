@@ -1,6 +1,11 @@
 package process
 
-import "github.com/robolaunch/cosmodrome/pkg/api"
+import (
+	"fmt"
+
+	"github.com/kyokomi/emoji/v2"
+	"github.com/robolaunch/cosmodrome/pkg/api"
+)
 
 func Start(lc *api.LaunchConfig) error {
 	status := api.NewLaunchStatus()
@@ -12,9 +17,12 @@ func Start(lc *api.LaunchConfig) error {
 			status.StepStatuses = append(status.StepStatuses, *stepStatus)
 			return err
 		}
-
+		emoji.Println(SuccessLog.Sprint(":whale: is generated."))
 		status.StepStatuses = append(status.StepStatuses, *stepStatus)
 	}
+
+	fmt.Println()
+	emoji.Println(":rocket: Steps are completed.")
 
 	return nil
 }
