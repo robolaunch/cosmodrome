@@ -35,8 +35,9 @@ func start(step *api.Step, status *api.StepStatus, lc api.LaunchConfig) error {
 func build(step *api.Step, baseStep api.Step, stepStatus *api.StepStatus, lc api.LaunchConfig) error {
 
 	stepStatus.Phase = api.StepPhaseBuilding
-
-	StepLog.Println("Building step: " + step.Name)
+	logSpinner := getSpinner(StepLog, " Building step: "+step.Name)
+	logSpinner.Start()
+	defer logSpinner.Stop()
 	if err := docker.Build(context.Background(), step.Dockerfile, step.Path, baseStep.Image.Name, *step, lc); err != nil {
 		return err
 	}
@@ -48,7 +49,9 @@ func push(step *api.Step, stepStatus *api.StepStatus, lc api.LaunchConfig) error
 
 	stepStatus.Phase = api.StepPhasePushing
 
-	StepLog.Println("Pushing step: " + step.Name)
+	logSpinner := getSpinner(StepLog, " Pushing step: "+step.Name)
+	logSpinner.Start()
+	defer logSpinner.Stop()
 	if err := docker.Push(context.Background(), *step, lc); err != nil {
 		return err
 	}
