@@ -15,6 +15,7 @@ type Image struct {
 type Step struct {
 	Name       string             `yaml:"name"`
 	Image      Image              `yaml:"image"`
+	Path       string             `yaml:"path"`
 	Dockerfile string             `yaml:"dockerfile"`
 	BaseStep   string             `yaml:"baseStep"`
 	BuildArgs  map[string]*string `yaml:"buildArgs"`
@@ -32,6 +33,9 @@ func (step *Step) setImageName(lc LaunchConfig) {
 func (step *Step) validate(key int) error {
 	if reflect.DeepEqual(step.Name, "") {
 		return errors.New(".steps[" + strconv.Itoa(key) + "].name cannot be empty")
+	}
+	if reflect.DeepEqual(step.Path, "") {
+		return errors.New(".steps[" + strconv.Itoa(key) + "].path cannot be empty")
 	}
 	if reflect.DeepEqual(step.Dockerfile, "") {
 		return errors.New(".steps[" + strconv.Itoa(key) + "].dockerfile cannot be empty")
