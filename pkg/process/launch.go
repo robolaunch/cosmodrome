@@ -20,11 +20,11 @@ func Start(lc *api.LaunchConfig) error {
 
 		status.StepStatuses = append(status.StepStatuses, *stepStatus)
 
-		emoji.Println(SuccessLog.Sprint(":whale: " + lc.Steps[k].Image.Name + " is generated"))
+		emoji.Print(SuccessLog.Sprint(":whale: " + lc.Steps[k].Image.Name + " is generated"))
 		if lc.Steps[k].Push {
 			SuccessLog.Print(" and pushed")
 		}
-		SuccessLog.Print(".")
+		SuccessLog.Println(".")
 	}
 
 	fmt.Println()
