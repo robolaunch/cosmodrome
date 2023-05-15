@@ -22,7 +22,7 @@ func Start(lc *api.LaunchConfig) error {
 	}
 
 	fmt.Println()
-	emoji.Println(":rocket: Steps are completed.")
+	emoji.Println(SuccessLog.Sprint(":rocket: Steps are completed."))
 
 	return nil
 }
