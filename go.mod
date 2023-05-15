@@ -6,6 +6,7 @@ require (
 	github.com/briandowns/spinner v1.23.0
 	github.com/docker/docker v23.0.6+incompatible
 	github.com/fatih/color v1.13.0
+	github.com/kyokomi/emoji/v2 v2.2.12
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
 	gopkg.in/yaml.v3 v3.0.1
