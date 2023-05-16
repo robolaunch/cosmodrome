@@ -42,7 +42,9 @@ cosmodrome launch --config pipelines/freecad.yaml
 To enable pushes, add your personal access token to your environment first:
 
 ```bash
+# for Docker Hub
 export REGISTRY_PAT=<YOUR-PAT>
+docker login -u <ORGANIZATION> -p $REGISTRY_PAT
 ```
 
 ## Contributing
