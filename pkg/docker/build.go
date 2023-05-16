@@ -119,6 +119,12 @@ func BuildMultiplatform(ctx context.Context, dfName, dfPath, baseImage string, s
 		"--use",
 	)
 
+	platformStr := ""
+	for _, platform := range step.Platforms {
+		platformStr += platform + ","
+	}
+	platformStr = platformStr[0 : len(platformStr)-1]
+
 	cmdBuildElements := []string{
 		"buildx",
 		"build",
@@ -126,7 +132,7 @@ func BuildMultiplatform(ctx context.Context, dfName, dfPath, baseImage string, s
 		"--file",
 		step.Path + "/" + step.Dockerfile,
 		"--platform",
-		"linux/amd64,linux/arm64",
+		platformStr,
 		"-t",
 		step.Image.Name,
 	}
