@@ -20,3 +20,18 @@ Please note that this project is released with a [Contributor Code of Conduct][c
   - Avoid rebuilding existing images.
   - Version your components and images, use build arguments for seperating them.
 - Open a pull request for merging your changes. eg. from `23-freecad` to `main`
+
+## Commit Styling
+
+Use [semantic commit messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716):
+
+```bash
+# examples
+# ........
+# use feat for adding a new component
+git commit -m "feat(freecad): add dockerfile and pipeline for freecad images"
+# use refactor for small changes
+git commit -m "refactor(freecad): change linux user in dockerfile"
+# use fix for small changes
+git commit -m "fix(freecad): fix dockerfile syntax error"
+```
