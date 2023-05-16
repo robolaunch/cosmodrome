@@ -19,7 +19,7 @@
 Install with Go:
 
 ```bash
-go install ...
+go install github.com/robolaunch/cosmodrome@latest
 ```
 
 Install binary:
