@@ -60,6 +60,7 @@ var launchCmd = &cobra.Command{
 }
 
 func init() {
-	launchCmd.PersistentFlags().Bool("no-cache", false, "images will be fetched from remote repositories")
+	launchCmd.PersistentFlags().BoolP("cache", "c", true, "use cache")
+	viper.SetDefault("cache", true)
 	rootCmd.AddCommand(launchCmd)
 }
