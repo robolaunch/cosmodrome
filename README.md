@@ -39,6 +39,12 @@ For example, building Freecad, run:
 cosmodrome launch --config pipelines/freecad.yaml
 ```
 
+To enable pushes, add your personal access token to your environment first:
+
+```bash
+export REGISTRY_PAT=<YOUR-PAT>
+```
+
 ## Contributing
 
 Please see [this guide](./CONTRIBUTING) if you want to contribute.
