@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -89,6 +90,103 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step,
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func BuildMultiplatform(ctx context.Context, dfName, dfPath, baseImage string, step api.Step, lc api.LaunchConfig) error {
+
+	// docker buildx rm multiarch_builder || true
+
+	cmdDriverRemover := exec.CommandContext(
+		context.Background(),
+		"docker",
+		"buildx",
+		"rm",
+		"multiarch_builder",
+	)
+
+	// docker buildx create --name multiarch_builder --use
+
+	cmdDriverCreator := exec.CommandContext(
+		context.Background(),
+		"docker",
+		"buildx",
+		"create",
+		"--name",
+		"multiarch_builder",
+		"--use",
+	)
+
+	platformStr := ""
+	for _, platform := range step.Platforms {
+		platformStr += platform + ","
+	}
+	platformStr = platformStr[0 : len(platformStr)-1]
+
+	cmdBuildElements := []string{
+		"buildx",
+		"build",
+		step.Path,
+		"--file",
+		step.Path + "/" + step.Dockerfile,
+		"--platform",
+		platformStr,
+		"-t",
+		step.Image.Name,
+	}
+
+	if step.Push {
+		cmdBuildElements = append(cmdBuildElements, "--push")
+	}
+
+	cmdBuilder := exec.CommandContext(
+		context.Background(),
+		"docker",
+		cmdBuildElements...,
+	)
+
+	if lc.Verbose {
+		cmdBuilder.Stdout = os.Stdout
+		cmdBuilder.Stderr = os.Stderr
+		cmdDriverRemover.Stdout = os.Stdout
+		cmdDriverRemover.Stderr = os.Stderr
+		cmdDriverCreator.Stdout = os.Stdout
+		cmdDriverCreator.Stderr = os.Stderr
+	} else {
+		var f *os.File
+		if _, err := os.Stat("out_" + lc.Logfile); errors.Is(err, os.ErrNotExist) {
+			err := os.Mkdir("out_"+lc.Logfile, os.ModePerm)
+			if err != nil {
+				return err
+			}
+			f, err = os.Create("out_" + lc.Logfile + "/out_" + step.Name + "_build_" + lc.Logfile)
+			if err != nil {
+				return err
+			}
+		} else {
+			f, err = os.Create("out_" + lc.Logfile + "/out_" + step.Name + "_build_" + lc.Logfile)
+			if err != nil {
+				return err
+			}
+		}
+
+		cmdBuilder.Stdout = f
+		cmdBuilder.Stderr = f
+		cmdDriverRemover.Stdout = f
+		cmdDriverRemover.Stderr = f
+		cmdDriverCreator.Stdout = f
+		cmdDriverCreator.Stderr = f
+	}
+
+	_ = cmdDriverRemover.Run()
+
+	if err := cmdDriverCreator.Run(); err != nil {
+		return err
+	}
+	if err := cmdBuilder.Run(); err != nil {
+		return err
 	}
 
 	return nil

@@ -20,7 +20,7 @@ func start(step *api.Step, status *api.StepStatus, lc api.LaunchConfig) error {
 		status.Phase = api.StepPhaseFailed
 		return err
 	}
-	if step.Push {
+	if step.Push && len(step.Platforms) == 0 {
 		if err := push(step, status, lc); err != nil {
 			status.Phase = api.StepPhaseFailed
 			return err
@@ -37,8 +37,14 @@ func build(step *api.Step, baseStep api.Step, stepStatus *api.StepStatus, lc api
 	stepStatus.Phase = api.StepPhaseBuilding
 	logSpinner := getSpinner(StepLog, " Building step: "+step.Name)
 	logSpinner.Start()
-	if err := docker.Build(context.Background(), step.Dockerfile, step.Path, baseStep.Image.Name, *step, lc); err != nil {
-		return err
+	if len(step.Platforms) == 0 {
+		if err := docker.Build(context.Background(), step.Dockerfile, step.Path, baseStep.Image.Name, *step, lc); err != nil {
+			return err
+		}
+	} else {
+		if err := docker.BuildMultiplatform(context.Background(), step.Dockerfile, step.Path, baseStep.Image.Name, *step, lc); err != nil {
+			return err
+		}
 	}
 	logSpinner.Stop()
 

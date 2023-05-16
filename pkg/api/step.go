@@ -19,6 +19,7 @@ type Step struct {
 	Dockerfile string             `yaml:"dockerfile"`
 	BaseStep   string             `yaml:"baseStep"`
 	BuildArgs  map[string]*string `yaml:"buildArgs"`
+	Platforms  []string           `yaml:"platforms"`
 	Push       bool               `yaml:"push"`
 }
 
