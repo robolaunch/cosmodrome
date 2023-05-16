@@ -1,4 +1,6 @@
-# Image Pipeline
+# Image Pipeline [DEPRECATED]
+
+This document is deprecated. Use `cosmodrome` CLI tool for creating image pipelines.
 
 Prerequisites for building images:
 
