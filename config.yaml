@@ -1,0 +1,20 @@
+name: new-build
+registry: docker.io
+organization: robolaunchio
+steps:
+- name: step-1
+  image:
+    repository: driver
+    tag: base
+  rootImage: "ubuntu:focal"
+  baseStep: ""
+  buildArgs: {}
+  push: false
+- name: step-2
+  image:
+    repository: vdi
+    tag: base
+  rootImage: "ubuntu:focal"
+  baseStep: "step-1"
+  buildArgs: {}
+  push: true
