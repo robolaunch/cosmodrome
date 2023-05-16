@@ -25,7 +25,10 @@ go install github.com/robolaunch/cosmodrome@latest
 Install binary:
 
 ```bash
-wget ...
+wget https://github.com/robolaunch/cosmodrome/releases/download/v0.1.0-alpha.1/cosmodrome-amd64
+chmod +x cosmodrome-amd64
+mv cosmodrome-amd64 /usr/local/bin/cosmodrome
+cosmodrome --help
 ```
 
 ### Usage
