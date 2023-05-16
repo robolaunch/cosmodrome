@@ -6,7 +6,6 @@ steps:
   image:
     repository: xfce
     tag: focal-xfce-withuser
-  baseStep: "xfce"
   path: "dockerfiles/base"
   dockerfile: "Dockerfile.withuser"
   buildArgs: 
