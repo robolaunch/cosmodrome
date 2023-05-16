@@ -20,7 +20,8 @@ var Error = log.New(os.Stdout, "\u001b[31mERROR: \u001b[0m", log.LstdFlags|log.L
 var launchCmd = &cobra.Command{
 	Use:   "launch",
 	Short: "Launch verb starts building components.",
-	Long:  `A longer description for launch.`,
+	Long: `Launch functionality is for pipelining builds and pushes. You should prepare a config file and define your pipeline before running this command.
+	eg. "cosmodrome launch --config config.yaml"`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// check if config will be printed out
