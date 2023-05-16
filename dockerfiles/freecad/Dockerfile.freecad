@@ -1,0 +1,7 @@
+ARG BASE_IMAGE=robolaunchio/vdi:focal-agnostic-xfce-withuser
+FROM ${BASE_IMAGE} as build
+ARG FREECAD_VERSION="0.18.4+dfsg2-1ubuntu4"
+RUN apt-get install -y freecad=${FREECAD_VERSION} libnglib-dev python3-pyqt5
+RUN ln -s /usr/lib/x86_64-linux-gnu/netgen/*.so /usr/lib/
+WORKDIR /home/robolaunch
+USER root
