@@ -1,0 +1,40 @@
+name: vdi-build
+registry: docker.io
+organization: tunahanertekin
+steps:
+- name: vdi
+  image:
+    repository: vdi
+    tag: focal-agnostic
+  baseStep: ""
+  path: "dockerfiles/base/vdi"
+  dockerfile: "Dockerfile"
+  buildArgs:
+    "NVIDIA_DRIVER_VERSION": "agnostic"
+    "GPU_AGNOSTIC": "true"
+    "BASE_IMAGE": "nvidia/opengl:1.2-glvnd-runtime-ubuntu20.04"
+  push: true
+- name: xfce
+  image:
+    repository: xfce
+    tag: focal-agnostic
+  baseStep: "vdi"
+  path: "dockerfiles/base/xfce"
+  dockerfile: "Dockerfile"
+  push: false
+- name: xfce-withuser
+  image:
+    repository: xfce-withuser
+    tag: focal-agnostic
+  baseStep: "xfce"
+  path: "dockerfiles/base"
+  dockerfile: "Dockerfile.withuser"
+  push: false
+- name: freecad
+  image:
+    repository: freecad
+    tag: "0.1.0"
+  baseStep: "xfce-withuser"
+  path: "dockerfiles/freecad"
+  dockerfile: "Dockerfile.freecad"
+  push: false
