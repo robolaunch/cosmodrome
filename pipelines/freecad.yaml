@@ -12,11 +12,23 @@ steps:
   buildArgs: 
     "BASE_IMAGE": "robolaunchio/vdi:focal-agnostic-xfce"
   push: false
-- name: freecad
+- name: freecad-0.18.3
   image:
     repository: freecad
-    tag: "0.1.0"
+    tag: focal-xfce-0.18.3
   baseStep: "xfce-withuser"
   path: "dockerfiles/freecad"
   dockerfile: "Dockerfile.freecad"
+  buildArgs:
+    "FREECAD_VERSION": "0.18.3+dfsg1-1"
+  push: false
+- name: freecad-0.18.4
+  image:
+    repository: freecad
+    tag: focal-xfce-0.18.4
+  baseStep: "xfce-withuser"
+  path: "dockerfiles/freecad"
+  dockerfile: "Dockerfile.freecad"
+  buildArgs:
+    "FREECAD_VERSION": "0.18.4+dfsg2-1ubuntu4"
   push: false
