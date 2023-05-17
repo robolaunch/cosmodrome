@@ -16,7 +16,7 @@ import (
 	"github.com/robolaunch/cosmodrome/pkg/api"
 )
 
-func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step, lc api.LaunchConfig) error {
+func Build(ctx context.Context, dfName, dfPath, buildContext, baseImage string, step api.Step, lc api.LaunchConfig) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step,
 
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
-	tar, err := archive.TarWithOptions(dfPath, &archive.TarOptions{})
+	tar, err := archive.TarWithOptions(buildContext, &archive.TarOptions{})
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step,
 		tar,
 		types.ImageBuildOptions{
 			Context:    dockerFileTarReader,
-			Dockerfile: dfName,
+			Dockerfile: dfPath + "/" + dfName,
 			Remove:     true,
 			Tags:       []string{step.Image.Name},
 			BuildArgs:  buildArgs,
@@ -95,7 +95,7 @@ func Build(ctx context.Context, dfName, dfPath, baseImage string, step api.Step,
 	return nil
 }
 
-func BuildMultiplatform(ctx context.Context, dfName, dfPath, baseImage string, step api.Step, lc api.LaunchConfig) error {
+func BuildMultiplatform(ctx context.Context, dfName, dfPath, buildContext, baseImage string, step api.Step, lc api.LaunchConfig) error {
 
 	// docker buildx rm multiarch_builder || true
 
@@ -128,7 +128,7 @@ func BuildMultiplatform(ctx context.Context, dfName, dfPath, baseImage string, s
 	cmdBuildElements := []string{
 		"buildx",
 		"build",
-		step.Path,
+		step.Context,
 		"--file",
 		step.Path + "/" + step.Dockerfile,
 		"--platform",
