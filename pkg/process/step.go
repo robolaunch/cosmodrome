@@ -20,6 +20,7 @@ func handleSignal() {
 			if logSpinner.Enabled() {
 				logSpinner.Stop()
 			}
+			os.Exit(1)
 		}
 	}()
 }
