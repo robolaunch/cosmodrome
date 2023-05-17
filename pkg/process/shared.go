@@ -10,9 +10,8 @@ import (
 var LaunchLog *color.Color = color.New(color.FgYellow).Add(color.Italic).Add(color.Bold)
 var StepLog *color.Color = color.New(color.FgBlue)
 var SuccessLog *color.Color = color.New(color.FgGreen).Add(color.Bold)
+var logSpinner *spinner.Spinner = spinner.New(spinner.CharSets[4], 100*time.Millisecond)
 
-func getSpinner(logStyle *color.Color, msg string) *spinner.Spinner {
-	s := spinner.New(spinner.CharSets[4], 100*time.Millisecond)
-	s.Suffix = logStyle.Sprintln(msg)
-	return s
+func GetSpinner(logStyle *color.Color, msg string) {
+	logSpinner.Suffix = logStyle.Sprintln(msg)
 }
