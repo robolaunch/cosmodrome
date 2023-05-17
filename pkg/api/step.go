@@ -19,16 +19,24 @@ type Step struct {
 	Dockerfile string             `yaml:"dockerfile"`
 	BaseStep   string             `yaml:"baseStep"`
 	BuildArgs  map[string]*string `yaml:"buildArgs"`
+	Context    string             `yaml:"context"`
 	Platforms  []string           `yaml:"platforms"`
 	Push       bool               `yaml:"push"`
 }
 
 func (step *Step) Default(lc LaunchConfig) {
 	step.setImageName(lc)
+	step.setContext(lc)
 }
 
 func (step *Step) setImageName(lc LaunchConfig) {
 	step.Image.Name = lc.Registry + "/" + lc.Organization + "/" + step.Image.Repository + ":" + step.Image.Tag
+}
+
+func (step *Step) setContext(lc LaunchConfig) {
+	if step.Context == "" {
+		step.Context = "."
+	}
 }
 
 func (step *Step) validate(key int) error {
