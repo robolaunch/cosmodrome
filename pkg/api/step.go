@@ -27,6 +27,7 @@ type Step struct {
 func (step *Step) Default(lc LaunchConfig) {
 	step.setImageName(lc)
 	step.setContext(lc)
+	step.setBaseImage(lc)
 }
 
 func (step *Step) setImageName(lc LaunchConfig) {
@@ -36,6 +37,13 @@ func (step *Step) setImageName(lc LaunchConfig) {
 func (step *Step) setContext(lc LaunchConfig) {
 	if step.Context == "" {
 		step.Context = "."
+	}
+}
+
+func (step *Step) setBaseImage(lc LaunchConfig) {
+	if _, ok := step.BuildArgs["base_image"]; !ok {
+		baseStep, _ := step.GetBaseStep(lc)
+		step.BuildArgs["base_image"] = &baseStep.Image.Name
 	}
 }
 
