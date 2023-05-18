@@ -28,6 +28,4 @@ steps:
   baseStep: "xfce-withuser"
   path: "dockerfiles/freecad"
   dockerfile: "Dockerfile.freecad"
-  buildArgs:
-    "FREECAD_VERSION": "0.18.4+dfsg2-1ubuntu4"
   push: false

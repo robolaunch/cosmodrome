@@ -27,6 +27,7 @@ type Step struct {
 func (step *Step) Default(lc LaunchConfig) {
 	step.setImageName(lc)
 	step.setContext(lc)
+	step.setBuildArgs(lc)
 	step.setBaseImage(lc)
 }
 
@@ -37,6 +38,12 @@ func (step *Step) setImageName(lc LaunchConfig) {
 func (step *Step) setContext(lc LaunchConfig) {
 	if step.Context == "" {
 		step.Context = "."
+	}
+}
+
+func (step *Step) setBuildArgs(lc LaunchConfig) {
+	if len(step.BuildArgs) == 0 {
+		step.BuildArgs = make(map[string]*string)
 	}
 }
 
