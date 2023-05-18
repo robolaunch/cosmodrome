@@ -57,7 +57,7 @@ func build(step *api.Step, baseStep api.Step, stepStatus *api.StepStatus, lc api
 	GetSpinner(StepLog, " Building step: "+step.Name)
 	logSpinner.Start()
 	if len(step.Platforms) == 0 {
-		if err := docker.Build(context.Background(), step.Dockerfile, step.Path, step.Context, baseStep.Image.Name, *step, lc); err != nil {
+		if err := docker.Build(context.Background(), step.Dockerfile, step.Path, step.Context, *step, lc); err != nil {
 			return err
 		}
 	} else {

@@ -16,7 +16,7 @@ import (
 	"github.com/robolaunch/cosmodrome/pkg/api"
 )
 
-func Build(ctx context.Context, dfName, dfPath, buildContext, baseImage string, step api.Step, lc api.LaunchConfig) error {
+func Build(ctx context.Context, dfName, dfPath, buildContext string, step api.Step, lc api.LaunchConfig) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return err
@@ -38,10 +38,6 @@ func Build(ctx context.Context, dfName, dfPath, buildContext, baseImage string, 
 	// make all keys upper case
 	for k, v := range step.BuildArgs {
 		buildArgs[strings.ToUpper(k)] = v
-	}
-
-	if baseImage != "" {
-		buildArgs["BASE_IMAGE"] = &baseImage
 	}
 
 	imageBuildResponse, err := cli.ImageBuild(
