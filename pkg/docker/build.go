@@ -2,8 +2,10 @@ package docker
 
 import (
 	"archive/tar"
+	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"os"
@@ -15,6 +17,15 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/robolaunch/cosmodrome/pkg/api"
 )
+
+type ErrorLine struct {
+	Error       string      `json:"error"`
+	ErrorDetail ErrorDetail `json:"errorDetail"`
+}
+
+type ErrorDetail struct {
+	Message string `json:"message"`
+}
 
 func Build(ctx context.Context, dfName, dfPath, buildContext string, step api.Step, lc api.LaunchConfig) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
@@ -60,7 +71,7 @@ func Build(ctx context.Context, dfName, dfPath, buildContext string, step api.St
 	defer imageBuildResponse.Body.Close()
 
 	if lc.Verbose {
-		_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
+		err = printBuildLogs(os.Stdout, imageBuildResponse.Body)
 		if err != nil {
 			return err
 		}
@@ -82,10 +93,32 @@ func Build(ctx context.Context, dfName, dfPath, buildContext string, step api.St
 			}
 		}
 
-		_, err = io.Copy(f, imageBuildResponse.Body)
+		err = printBuildLogs(f, imageBuildResponse.Body)
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func printBuildLogs(dst io.Writer, rd io.Reader) error {
+	var lastLine string
+
+	scanner := bufio.NewScanner(rd)
+	for scanner.Scan() {
+		lastLine = scanner.Text()
+		io.Copy(dst, rd)
+	}
+
+	errLine := &ErrorLine{}
+	json.Unmarshal([]byte(lastLine), errLine)
+	if errLine.Error != "" {
+		return errors.New(errLine.Error)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
 	}
 
 	return nil
