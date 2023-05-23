@@ -28,6 +28,10 @@ type ErrorDetail struct {
 	Message string `json:"message"`
 }
 
+type BuildLog struct {
+	Stream string `json:"stream"`
+}
+
 func Build(ctx context.Context, dfName, dfPath, buildContext string, step api.Step, lc api.LaunchConfig) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
@@ -98,28 +102,6 @@ func Build(ctx context.Context, dfName, dfPath, buildContext string, step api.St
 		if err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-func printBuildLogs(dst io.Writer, rd io.Reader) error {
-	var lastLine string
-
-	scanner := bufio.NewScanner(rd)
-	for scanner.Scan() {
-		lastLine = scanner.Text()
-		fmt.Fprintln(dst, lastLine)
-	}
-
-	errLine := &ErrorLine{}
-	json.Unmarshal([]byte(lastLine), errLine)
-	if errLine.Error != "" {
-		return errors.New(errLine.Error)
-	}
-
-	if err := scanner.Err(); err != nil {
-		return err
 	}
 
 	return nil
@@ -216,6 +198,34 @@ func BuildMultiplatform(ctx context.Context, dfName, dfPath, buildContext, baseI
 		return err
 	}
 	if err := cmdBuilder.Run(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func printBuildLogs(dst io.Writer, rd io.Reader) error {
+	var lastLine string
+
+	scanner := bufio.NewScanner(rd)
+	for scanner.Scan() {
+		lastLine = scanner.Text()
+
+		buildLogLine := &BuildLog{}
+		json.Unmarshal([]byte(lastLine), buildLogLine)
+		if buildLogLine.Stream != "" {
+			fmt.Fprint(dst, buildLogLine.Stream)
+		}
+
+		errLine := &ErrorLine{}
+		json.Unmarshal([]byte(lastLine), errLine)
+		if errLine.Error != "" {
+			fmt.Fprint(dst, errLine.Error)
+			return errors.New(errLine.Error)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
 		return err
 	}
 
