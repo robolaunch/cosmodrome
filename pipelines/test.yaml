@@ -7,7 +7,7 @@ steps:
     repository: test
     tag: ascii
   path: "dockerfiles/testing"
-  dockerfile: "Dockerfile.first"
+  dockerfile: "Dockerfile.ascii"
   buildArgs: 
     "BASE_IMAGE": "ubuntu:focal"
   push: false
@@ -17,7 +17,7 @@ steps:
     tag: ascii-iputils
   baseStep: ascii
   path: "dockerfiles/testing"
-  dockerfile: "Dockerfile.second"
+  dockerfile: "Dockerfile.iputils"
   push: false
 - name: dnsutils
   image:
@@ -25,5 +25,5 @@ steps:
     tag: ascii-iputils-dnsutils
   baseStep: iputils
   path: "dockerfiles/testing"
-  dockerfile: "Dockerfile.third"
+  dockerfile: "Dockerfile.dnsutils"
   push: false
