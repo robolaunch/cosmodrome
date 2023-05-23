@@ -1,0 +1,29 @@
+name: testing
+registry: docker.io
+organization: tunahanertekin
+steps:
+- name: ascii
+  image:
+    repository: test
+    tag: ascii
+  path: "dockerfiles/testing"
+  dockerfile: "Dockerfile.first"
+  buildArgs: 
+    "BASE_IMAGE": "ubuntu:focal"
+  push: false
+- name: iputils
+  image:
+    repository: test
+    tag: ascii-iputils
+  baseStep: ascii
+  path: "dockerfiles/testing"
+  dockerfile: "Dockerfile.second"
+  push: false
+- name: dnsutils
+  image:
+    repository: test
+    tag: ascii-iputils-dnsutils
+  baseStep: iputils
+  path: "dockerfiles/testing"
+  dockerfile: "Dockerfile.third"
+  push: false

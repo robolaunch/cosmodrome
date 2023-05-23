@@ -1,0 +1,7 @@
+ARG BASE_IMAGE=ubuntu:focal
+FROM ${BASE_IMAGE}
+
+RUN apt-get update && apt-get install -y ascii
+RUN echoe "im error"
+
+CMD [ "sleep", "infinity" ]
