@@ -17,12 +17,16 @@ func handleSignal() {
 	go func() {
 		for sig := range c {
 			fmt.Println("Stopped process: " + sig.String())
-			if logSpinner.Enabled() {
-				logSpinner.Stop()
-			}
+			terminateSpinner()
 			os.Exit(1)
 		}
 	}()
+}
+
+func terminateSpinner() {
+	if logSpinner.Enabled() {
+		logSpinner.Stop()
+	}
 }
 
 func start(step *api.Step, status *api.StepStatus, lc api.LaunchConfig) error {
@@ -32,16 +36,19 @@ func start(step *api.Step, status *api.StepStatus, lc api.LaunchConfig) error {
 
 	baseStep, err := step.GetBaseStep(lc)
 	if err != nil {
+		terminateSpinner()
 		return err
 	}
 
 	if err := build(step, baseStep, status, lc); err != nil {
 		status.Phase = api.StepPhaseFailed
+		terminateSpinner()
 		return err
 	}
 	if step.Push && len(step.Platforms) == 0 {
 		if err := push(step, status, lc); err != nil {
 			status.Phase = api.StepPhaseFailed
+			terminateSpinner()
 			return err
 		}
 	}

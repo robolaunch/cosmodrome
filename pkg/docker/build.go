@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -108,7 +109,7 @@ func printBuildLogs(dst io.Writer, rd io.Reader) error {
 	scanner := bufio.NewScanner(rd)
 	for scanner.Scan() {
 		lastLine = scanner.Text()
-		io.Copy(dst, rd)
+		fmt.Fprintln(dst, lastLine)
 	}
 
 	errLine := &ErrorLine{}
