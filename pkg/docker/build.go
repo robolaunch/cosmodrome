@@ -149,6 +149,11 @@ func BuildMultiplatform(ctx context.Context, dfName, dfPath, buildContext, baseI
 		step.Image.Name,
 	}
 
+	for k, v := range step.BuildArgs {
+		cmdBuildElements = append(cmdBuildElements, "--build-arg")
+		cmdBuildElements = append(cmdBuildElements, strings.ToUpper(k)+"="+*v)
+	}
+
 	if step.Push {
 		cmdBuildElements = append(cmdBuildElements, "--push")
 	}

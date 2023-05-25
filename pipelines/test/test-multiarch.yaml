@@ -10,7 +10,10 @@ steps:
   dockerfile: "Dockerfile.ascii"
   buildArgs: 
     "BASE_IMAGE": "ubuntu:focal"
-  push: false
+  platforms:
+  - "linux/amd64"
+  - "linux/arm64"
+  push: true
 - name: iputils
   image:
     repository: test
@@ -18,7 +21,10 @@ steps:
   baseStep: ascii
   path: "dockerfiles/testing"
   dockerfile: "Dockerfile.iputils"
-  push: false
+  platforms:
+  - "linux/amd64"
+  - "linux/arm64"
+  push: true
 - name: dnsutils
   image:
     repository: test
@@ -26,4 +32,7 @@ steps:
   baseStep: iputils
   path: "dockerfiles/testing"
   dockerfile: "Dockerfile.dnsutils"
-  push: false
+  platforms:
+  - "linux/amd64"
+  - "linux/arm64"
+  push: true
