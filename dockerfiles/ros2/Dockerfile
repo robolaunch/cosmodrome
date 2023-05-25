@@ -28,3 +28,6 @@ RUN apt update && apt install -y \
     build-essential \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
+
+# add FastRTPS
+RUN apt update && apt install ros-${ROS_DISTRO_CODE}-rmw-fastrtps-cpp -y
