@@ -17,6 +17,7 @@ type LaunchConfig struct {
 	Logfile      string `yaml:"logfile,omitempty"`
 	Verbose      bool   `yaml:"verbose,omitempty"`
 	Cache        bool   `yaml:"cache,omitempty"`
+	Version      string `yaml:"version,omitempty"`
 }
 
 func (lc *LaunchConfig) PrintYAML() error {
@@ -43,6 +44,9 @@ func (lc *LaunchConfig) Validate() error {
 	}
 	if reflect.DeepEqual(lc.Organization, "") {
 		return errors.New(".organization cannot be empty")
+	}
+	if reflect.DeepEqual(lc.Version, "") {
+		return errors.New(".version cannot be empty")
 	}
 	if err := lc.validateSteps(); err != nil {
 		return err
