@@ -32,7 +32,7 @@ func (step *Step) Default(lc LaunchConfig) {
 }
 
 func (step *Step) setImageName(lc LaunchConfig) {
-	step.Image.Name = lc.Registry + "/" + lc.Organization + "/" + step.Image.Repository + ":" + step.Image.Tag
+	step.Image.Name = lc.Registry + "/" + lc.Organization + "/" + step.Image.Repository + ":" + step.Image.Tag + "-" + lc.Version
 }
 
 func (step *Step) setContext(lc LaunchConfig) {
