@@ -1,6 +1,6 @@
 
 ARG BASE_IMAGE="ubuntu:20.04"
-FROM ${BASE_IMAGE}-${TARGETARCH}
+FROM ${BASE_IMAGE}
 
 SHELL ["/bin/bash", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
