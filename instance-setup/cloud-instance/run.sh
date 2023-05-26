@@ -210,6 +210,7 @@ label_node () {
     print_log "Labeling node...";
     check_node_name;
     kubectl label --overwrite=true node $NODE_NAME \
+        robolaunch.io/platform=$PLATFORM_VERSION \
         robolaunch.io/organization=$ORGANIZATION \
         robolaunch.io/region=$REGION \
         robolaunch.io/team=$TEAM \
