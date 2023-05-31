@@ -1,0 +1,9 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+RUN apt-get update && apt-get install -y pyqt5-dev-tools
+USER robolaunch
+COPY ./qcad-3.28.1-trial-linux-qt5.14-x86_64.run /home/robolaunch
+RUN bash /home/robolaunch/qcad-3.28.1-trial-linux-qt5.14-x86_64.run
+RUN rm /home/robolaunch/qcad-3.28.1-trial-linux-qt5.14-x86_64.run
+USER root
+WORKDIR /home/robolaunch

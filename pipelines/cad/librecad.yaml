@@ -1,0 +1,15 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: librecad
+  image:
+    repository: devspace-cad
+    tag: librecad-focal-xfce-0.18.3
+  path: "dockerfiles/cad"
+  dockerfile: "Dockerfile.librecad"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "QCAD_VERSION": "0.1.1"
+  push: false

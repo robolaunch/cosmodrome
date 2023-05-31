@@ -1,0 +1,5 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+RUN apt-get update && apt-get install -y pyqt5-dev-tools librecad
+USER root
+WORKDIR /home/robolaunch

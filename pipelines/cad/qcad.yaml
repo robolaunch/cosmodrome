@@ -1,0 +1,16 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: qcad
+  image:
+    repository: devspace-cad
+    tag: qcad-focal-xfce-0.18.3
+  path: "."
+  context: "dockerfiles/cad/qcad"
+  dockerfile: "Dockerfile.qcad"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "QCAD_VERSION": "0.1.1"
+  push: false
