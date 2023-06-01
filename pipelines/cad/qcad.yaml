@@ -6,11 +6,11 @@ steps:
 - name: qcad
   image:
     repository: devspace-cad
-    tag: qcad-focal-xfce-0.18.3
+    tag: qcad-3.28.1-focal-xfce
   path: "."
   context: "dockerfiles/cad/qcad"
   dockerfile: "Dockerfile.qcad"
   buildArgs:
     "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
-    "QCAD_VERSION": "0.1.1"
+    "QCAD_VERSION": "3.28.1"
   push: false
