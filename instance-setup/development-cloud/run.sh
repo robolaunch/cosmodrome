@@ -292,7 +292,8 @@ install_operator_suite () {
 }
 
 display_ending_msg () {
-    print_log "robolaunch DevCloud setup is finished successfully! You can now operate your development environments inside $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+    printf "\n\n"
+    printf "robolaunch DevCloud setup is finished successfully! You can now operate your development environments inside $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.\n";
 }
 
 print_global_log "Waiting for the preflight checks...";
