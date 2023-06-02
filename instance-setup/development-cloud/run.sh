@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ORGANIZATION=rls-doo \
-# TEAM=team-cloudy \
+# TEAM=team-nlp \
 # REGION=eu-east-2 \
-# CLOUD_INSTANCE=robot-cloud-02 \
+# CLOUD_INSTANCE=dev-cloud-02 \
 # CLOUD_INSTANCE_ALIAS=instance-1 \
 # DESIRED_CLUSTER_CIDR=10.100.1.0/24 \
 # DESIRED_SERVICE_CIDR=10.100.2.0/24 \
@@ -12,27 +12,24 @@
 set -e;
 
 BLUE='\033[0;34m';
+GREEN='\033[0;32m';
 RED='\033[0;31m';
 NC='\033[0m';
 
-CERT_MANAGER_VERSION="v1.8.0";
-OPERATOR_SUITE_VERSION="0.1.0";
 CH_CLOUD_INSTANCE_URL="https://gist.githubusercontent.com/tunahanertekin/f041e2c3fbc6cdaadd72816c350b357c/raw/ac86a73e70ea8dce5903eed3472b26afdc255f0d/ch-ci.yaml";
-K3S_VERSION="v1.24.10"
 ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
-
 
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
 
 print_global_log () {
-    echo -e "${BLUE}$1${NC}" >&3;
+    echo -e "${GREEN}$1${NC}" >&3;
 }
 
 print_log () {
-    echo -e "${BLUE}$1${NC}";
+    echo -e "${GREEN}$1${NC}";
 }
 
 print_err () {
@@ -102,17 +99,17 @@ set_desired_service_cidr () {
     fi
 }
 
-set_internal_ip () {
-    if [[ -z "${INTERNAL_IP}" ]]; then
-        INTERNAL_IP=$(hostname -I | sed 's/|/ /' | awk '{print $1}')
+set_public_ip () {
+    if [[ -z "${PUBLIC_IP}" ]]; then
+        PUBLIC_IP=$(curl https://ipinfo.io/ip);
     else
-        INTERNAL_IP=$INTERNAL_IP;
+        PUBLIC_IP=$PUBLIC_IP;
     fi
 }
 
 check_api_server_url () {
-    set_internal_ip
-    CLOUD_INSTANCE_API_SERVER_URL="$INTERNAL_IP:6443";
+    set_public_ip
+    CLOUD_INSTANCE_API_SERVER_URL="$PUBLIC_IP:6443";
 }
 
 check_node_name () {
@@ -138,29 +135,44 @@ check_inputs () {
     set_desired_service_cidr;
 }
 
+get_versioning_map () {
+    wget https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml;
+}
+
 opening () {
     apt-get update 2>/dev/null 1>/dev/null;
     apt-get install -y figlet 2>/dev/null 1>/dev/null; 
     figlet 'robolaunch' -f slant;
+    echo "Cloud Robotics Platform $PLATFORM_VERSION";
     printf "\n";
     echo "\"We Empower ROS/ROS2 based GPU Offloaded Robots & Geographically Distributed Fleets\"";
     printf "\n";
 }
 
-install_tools () {
+check_if_root () {
+    if [ $USER != "root" ]; then
+        print_err "You should switch to root using \"sudo -i\" before setup."
+    fi
+}
+
+install_pre_tools () {
     print_log "Installing Tools...";
     # apt packages
     apt-get update;
     apt-get install -y curl wget;
+    # install yq
+    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH};
+    chmod a+x /usr/local/bin/yq;
+}
+
+install_post_tools () {
+    print_log "Installing Tools...";
     # helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash;
     # install kubectl
     curl -LO https://dl.k8s.io/release/$K3S_VERSION/bin/linux/${ARCH}/kubectl;
     install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl;
     rm -rf kubectl;
-    # install yq
-    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${ARCH};
-    chmod a+x /usr/local/bin/yq;
 }
 
 set_up_nvidia_container_runtime () {
@@ -190,14 +202,15 @@ check_cluster () {
     check_api_server_url;
     check_cluster_cidr;
     check_service_cidr;
-    set_internal_ip
-    curl -vk --resolve $INTERNAL_IP:6443:127.0.0.1  https://$INTERNAL_IP:6443/ping;
+    set_public_ip
+    curl -vk --resolve $PUBLIC_IP:6443:127.0.0.1  https://$PUBLIC_IP:6443/ping;
 }
 
 label_node () {
     print_log "Labeling node...";
     check_node_name;
     kubectl label --overwrite=true node $NODE_NAME \
+        robolaunch.io/platform=$PLATFORM_VERSION \
         robolaunch.io/organization=$ORGANIZATION \
         robolaunch.io/region=$REGION \
         robolaunch.io/team=$TEAM \
@@ -261,75 +274,46 @@ install_cert_manager () {
 }
 
 install_operator_suite () {
-    print_log "Installing operator Helm charts... This might take around one minute."
-    HELM_INSTALL_SUCCEEDED="false"
+    print_log "Installing DevSpace Operator Helm chart... This might take around one minute."
 
-    while [ "$HELM_INSTALL_SUCCEEDED" != "true" ]
+    DO_HELM_INSTALL_SUCCEEDED="false"
+    while [ "$DO_HELM_INSTALL_SUCCEEDED" != "true" ]
     do 
-        HELM_INSTALL_SUCCEEDED="true"
+        DO_HELM_INSTALL_SUCCEEDED="true"
         helm upgrade -i \
-            operator-suite robolaunch/operator-suite \
-            --set global.organization=$ORGANIZATION \
-            --set global.team=$TEAM \
-            --set global.region=$REGION \
-            --set global.cloudInstance=$CLOUD_INSTANCE \
-            --set global.cloudInstanceAlias=$CLOUD_INSTANCE_ALIAS \
-            --version $OPERATOR_SUITE_VERSION || HELM_INSTALL_SUCCEEDED="false";
+            devspace-operator robolaunch/devspace-operator \
+            --namespace devspace-system \
+            --create-namespace \
+            --version $DEVSPACE_OPERATOR_CHART_VERSION || DO_HELM_INSTALL_SUCCEEDED="false";
+        sleep 1;
     done
 
-    sleep 30;
+    sleep 15;
 }
 
-check_connection_hub_phase () {
-    while [ true ]
-    do
-        CH_PHASE=$(kubectl get connectionhub connection-hub -o jsonpath=\"{.status.phase}\" | yq -P);
-        if [ "$CH_PHASE" = "ReadyForOperation" ]; then
-            print_log "Connection hub is ready to establish connections.";
-            break;
-        fi
-
-        print_log "Checking connection hub phase -> $CH_PHASE";
-        sleep 3;
-    done
+display_ending_msg () {
+    print_log "robolaunch DevCloud setup is finished successfully! You can now operate your development environments inside $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
 }
 
-deploy_connection_hub () {
-    print_log "Deploying connection hub..."
-    check_cluster
-    wget $CH_CLOUD_INSTANCE_URL;
-    yq e -i ".metadata.labels.\"robolaunch.io/cloud-instance\" = \"$CLOUD_INSTANCE\"" ch-ci.yaml;
-    yq e -i ".metadata.labels.\"robolaunch.io/cloud-instance-alias\" = \"$CLOUD_INSTANCE_ALIAS\"" ch-ci.yaml;
-    yq e -i ".spec.submarinerSpec.apiServerURL = \"$CLOUD_INSTANCE_API_SERVER_URL\"" ch-ci.yaml;
-    yq e -i ".spec.submarinerSpec.clusterCIDR = \"$CLOUD_INSTANCE_CLUSTER_CIDR\"" ch-ci.yaml;
-    yq e -i ".spec.submarinerSpec.serviceCIDR = \"$CLOUD_INSTANCE_SERVICE_CIDR\"" ch-ci.yaml;
-    
-    CH_INSTALL_SUCCEEDED="false"
-    while [ "$CH_INSTALL_SUCCEEDED" != "true" ]
-    do 
-        CH_INSTALL_SUCCEEDED="true"
-        kubectl apply -f ch-ci.yaml || CH_INSTALL_SUCCEEDED="false";
-        sleep 3;
-    done
+print_global_log "Waiting for the preflight checks...";
+(check_if_root)
+(install_pre_tools)
+(get_versioning_map)
 
-    rm -rf ch-ci.yaml
-    check_connection_hub_phase;
-}
-
-display_connection_hub_key () {
-    # CONNECTION_HUB_KEY=$(kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P);
-    printf "\n\n"
-    printf "Get connection hub key by running the command below:\n\n";
-    printf "kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P";
-    printf "\n\n"
-    print_log "You can use this key to establish a connection with cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
-}
+# Specifying platform & component versions
+if [[ -z "${PLATFORM_VERSION}" ]]; then
+    PLATFORM_VERSION=$(yq '.versions[0].version' < platform.yaml)
+fi
+VERSION_SELECTOR_STR='.versions[] | select(.version == "'"$PLATFORM_VERSION"'")'
+K3S_VERSION=v$(yq ''"${VERSION_SELECTOR_STR}"' | .devCloud.kubernetes.version' < platform.yaml)
+CERT_MANAGER_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .devCloud.kubernetes.components.cert-manager.version' < platform.yaml)
+DEVSPACE_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .devCloud.kubernetes.operators.devspace.helm.version' < platform.yaml)
 
 opening >&3
 (check_inputs)
 
 print_global_log "Installing tools...";
-(install_tools)
+(install_post_tools)
 
 print_global_log "Setting up NVIDIA container runtime...";
 (set_up_nvidia_container_runtime)
@@ -358,10 +342,7 @@ print_global_log "Installing NVIDIA device plugin...";
 print_global_log "Installing cert-manager...";
 (install_cert_manager)
 
-print_global_log "Installing robolaunch Operator Suite...";
-(install_operator_suite)
+print_global_log "Installing robolaunch DevSpace Operator...";
+(install_devspace_operator)
 
-print_global_log "Deploying Connection Hub...";
-(deploy_connection_hub)
-
-display_connection_hub_key >&3
+display_ending_msg >&3
