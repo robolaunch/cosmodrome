@@ -293,7 +293,7 @@ install_devspace_operator () {
 
 display_ending_msg () {
     printf "\n\n"
-    printf "robolaunch DevCloud setup is finished successfully! You can now operate your development environments inside $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.\n";
+    printf "robolaunch Development Cloud setup is finished successfully! You can now operate your development environments inside $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.\n";
 }
 
 print_global_log "Waiting for the preflight checks...";
