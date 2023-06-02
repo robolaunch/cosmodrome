@@ -291,6 +291,10 @@ install_operator_suite () {
     sleep 15;
 }
 
+display_ending_msg () {
+    print_log "robolaunch DevCloud setup is finished successfully! You can now operate your development environments inside $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
+}
+
 print_global_log "Waiting for the preflight checks...";
 (check_if_root)
 (install_pre_tools)
@@ -340,3 +344,5 @@ print_global_log "Installing cert-manager...";
 
 print_global_log "Installing robolaunch DevSpace Operator...";
 (install_devspace_operator)
+
+display_ending_msg >&3
