@@ -273,7 +273,7 @@ install_cert_manager () {
     sleep 30;
 }
 
-install_operator_suite () {
+install_devspace_operator () {
     print_log "Installing DevSpace Operator Helm chart... This might take around one minute."
 
     DO_HELM_INSTALL_SUCCEEDED="false"
