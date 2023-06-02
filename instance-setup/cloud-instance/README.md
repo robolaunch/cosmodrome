@@ -9,7 +9,7 @@ This is the table of contents for this document.
 
 ## Quick Start
 
-This document assumes you have **a desktop environment** or **virtual machine** (with `amd64` architecture) on any cloud provider and has Ubuntu 20.04 or 22.04 on it.
+This document assumes you have Ubuntu Server (with `amd64` architecture) on any cloud provider and has Ubuntu 20.04 or 22.04 on it.
 
 ### Running the Script
 
@@ -25,7 +25,7 @@ export CLOUD_INSTANCE=cloud-instance
 export CLOUD_INSTANCE_ALIAS=my-first-instance
 export DESIRED_CLUSTER_CIDR=10.100.1.0/24
 export DESIRED_SERVICE_CIDR=10.100.2.0/24
-export RUN_SCRIPT=run.sh # replace `run.sh` with `run_desktop.sh` if you are in a desktop environment
+export RUN_SCRIPT=run.sh
 wget https://raw.githubusercontent.com/robolaunch/cosmodrome/main/instance-setup/cloud-instance/$RUN_SCRIPT
 chmod +x $RUN_SCRIPT
 ./$RUN_SCRIPT
