@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 type Image struct {
@@ -32,7 +33,15 @@ func (step *Step) Default(lc LaunchConfig) {
 }
 
 func (step *Step) setImageName(lc LaunchConfig) {
-	step.Image.Name = lc.Registry + "/" + lc.Organization + "/" + step.Image.Repository + ":" + step.Image.Tag + "-" + lc.Version
+	step.Image.Name = lc.Registry + "/" + lc.Organization + "/" + step.Image.Repository + ":" + formatTag(step.Image.Tag) + "-" + lc.Version
+}
+
+func formatTag(tag string) string {
+	// no "+" is allowed
+	// no "~" is allowed
+	tag = strings.ReplaceAll(tag, "+", "-")
+	tag = strings.ReplaceAll(tag, "~", "-")
+	return tag
 }
 
 func (step *Step) setContext(lc LaunchConfig) {
