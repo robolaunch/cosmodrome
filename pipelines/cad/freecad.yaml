@@ -6,7 +6,7 @@ steps:
 - name: freecad
   image:
     repository: devspace-cad
-    tag: freecad-0.18.4-dfsg2-1ubuntu4-focal-xfce
+    tag: freecad-0.18.4+dfsg2-1ubuntu4-focal-xfce
   path: "dockerfiles/cad"
   dockerfile: "Dockerfile.freecad"
   buildArgs:
