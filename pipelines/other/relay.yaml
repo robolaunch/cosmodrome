@@ -1,0 +1,15 @@
+name: relay
+registry: docker.io
+organization: robolaunchio
+version: 0.1.0
+steps:
+- name: relay
+  image:
+    repository: relay
+    tag: socat-1.7.3.3-2-focal
+  path: "dockerfiles/other"
+  dockerfile: "Dockerfile.relay"
+  buildArgs:
+    "BASE_IMAGE": "ubuntu:focal"
+    "SOCAT_VERSION": "1.7.3.3-2"
+  push: false
