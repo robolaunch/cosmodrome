@@ -6,10 +6,10 @@ steps:
 - name: librecad
   image:
     repository: devspace-cad
-    tag: librecad-2.1.3-focal-xfce
+    tag: librecad-2.1.3-1.2-deb10u1build0.20.04.1-focal-xfce
   path: "dockerfiles/cad"
   dockerfile: "Dockerfile.librecad"
   buildArgs:
     "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
-    "LIBRECAD_VERSION": "2.1.3"
+    "LIBRECAD_VERSION": "2.1.3-1.2+deb10u1build0.20.04.1"
   push: false
