@@ -1,6 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as build
-RUN apt-get install -y freecad libnglib-dev python3-pyqt5
+ARG FREECAD_VERSION
+RUN apt-get install -qy freecad=${FREECAD_VERSION} libnglib-dev python3-pyqt5
 RUN ln -s /usr/lib/x86_64-linux-gnu/netgen/*.so /usr/lib/
 WORKDIR /home/robolaunch
 USER root

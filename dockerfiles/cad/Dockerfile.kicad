@@ -1,6 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as build
+ARG KICAD_VERSION
 RUN add-apt-repository --yes ppa:kicad/kicad-7.0-releases
-RUN apt-get update && apt-get install -y --install-recommends kicad
+RUN apt-get update && apt-get install -qy --install-recommends kicad=${KICAD_VERSION}
 WORKDIR /home/robolaunch
 USER root

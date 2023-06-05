@@ -1,5 +1,6 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as build
-RUN apt-get update && apt-get install -y blender
+ARG BLENDER_VERSION
+RUN apt-get update && apt-get install -qy blender=${BLENDER_VERSION}
 WORKDIR /home/robolaunch
 USER root
