@@ -1,16 +1,16 @@
 name: iron
 registry: docker.io
 organization: robolaunchio
-version: 0.1.0
+version: 0.1.1
 steps:
 - name: iron
   image:
     repository: devspace-robotics
-    tag: iron-xfce
+    tag: ros2-iron-jammy-xfce
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
   buildArgs: 
-    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.0"
+    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.1"
     "ROS_DISTRO_CODE": "iron"
   platforms:
   - "linux/amd64"

@@ -1,16 +1,16 @@
 name: humble
 registry: docker.io
 organization: robolaunchio
-version: 0.1.0
+version: 0.1.1
 steps:
 - name: humble
   image:
     repository: devspace-robotics
-    tag: humble-xfce
+    tag: ros2-humble-jammy-xfce
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
   buildArgs: 
-    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.0"
+    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.1"
     "ROS_DISTRO_CODE": "humble"
   platforms:
   - "linux/amd64"

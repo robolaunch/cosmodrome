@@ -1,16 +1,16 @@
 name: foxy
 registry: docker.io
 organization: robolaunchio
-version: 0.1.0
+version: 0.1.1
 steps:
 - name: foxy
   image:
     repository: devspace-robotics
-    tag: foxy-xfce
+    tag: ros2-foxy-focal-xfce
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
   buildArgs: 
-    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.0"
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
     "ROS_DISTRO_CODE": "foxy"
   platforms:
   - "linux/amd64"
