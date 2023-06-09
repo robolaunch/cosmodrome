@@ -16,7 +16,6 @@ GREEN='\033[0;32m';
 RED='\033[0;31m';
 NC='\033[0m';
 
-CH_CLOUD_INSTANCE_URL="https://gist.githubusercontent.com/tunahanertekin/f041e2c3fbc6cdaadd72816c350b357c/raw/ac86a73e70ea8dce5903eed3472b26afdc255f0d/ch-ci.yaml";
 ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
@@ -332,7 +331,7 @@ check_connection_hub_phase () {
 deploy_connection_hub () {
     print_log "Deploying connection hub..."
     check_cluster
-    wget $CH_CLOUD_INSTANCE_URL;
+    wget $CONNECTION_HUB_RESOURCE_URL;
     yq e -i ".metadata.labels.\"robolaunch.io/cloud-instance\" = \"$CLOUD_INSTANCE\"" ch-ci.yaml;
     yq e -i ".metadata.labels.\"robolaunch.io/cloud-instance-alias\" = \"$CLOUD_INSTANCE_ALIAS\"" ch-ci.yaml;
     yq e -i ".spec.submarinerSpec.apiServerURL = \"$CLOUD_INSTANCE_API_SERVER_URL\"" ch-ci.yaml;
@@ -373,6 +372,7 @@ VERSION_SELECTOR_STR='.versions[] | select(.version == "'"$PLATFORM_VERSION"'")'
 K3S_VERSION=v$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.version' < platform.yaml)
 CERT_MANAGER_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.components.cert-manager.version' < platform.yaml)
 CONNECTION_HUB_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.connectionHub.helm.version' < platform.yaml)
+CONNECTION_HUB_RESOURCE_URL=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.connectionHub.resources.cloudInstance' < platform.yaml)
 ROBOT_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.robot.helm.version' < platform.yaml)
 FLEET_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.fleet.helm.version' < platform.yaml)
 
