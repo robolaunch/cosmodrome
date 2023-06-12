@@ -1,0 +1,103 @@
+ARG BASE_IMAGE
+ARG ISAACSIM_VERSION
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG BASE_DIST=ubuntu20.04
+ARG CUDA_VERSION=11.4.2
+
+FROM nvcr.io/nvidia/isaac-sim:${ISAACSIM_VERSION} as isaac-sim 
+
+FROM ${BASE_IMAGE} as build
+
+ENV NVARCH x86_64
+ENV NVIDIA_REQUIRE_CUDA "cuda>=11.4 brand=tesla,driver>=418,driver<419 brand=tesla,driver>=450,driver<451"
+ENV NV_CUDA_CUDART_VERSION 11.4.108-1
+ENV NV_CUDA_COMPAT_PACKAGE cuda-compat-11-4
+ARG arm64
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnupg2 curl ca-certificates && \
+    curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/${NVARCH}/3bf863cc.pub | apt-key add - && \
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/${NVARCH} /" > /etc/apt/sources.list.d/cuda.list \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV CUDA_VERSION 11.4.2
+
+# For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
+RUN apt-get update && apt-get install -y --no-install-recommends --allow-downgrades \
+    cuda-cudart-11-4=${NV_CUDA_CUDART_VERSION} \
+    ${NV_CUDA_COMPAT_PACKAGE} \
+    && rm -rf /var/lib/apt/lists/*
+
+# Required for nvidia-docker v1
+RUN echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf \
+    && echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf
+ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libatomic1 \
+    libegl1 \
+    libglu1-mesa \
+    libgomp1 \
+    libsm6 \
+    libxi6 \
+    libxrandr2 \
+    libxt6 \
+    wget \
+    vulkan-utils \
+#   xserver-xorg-video-dummy \ 
+#&& apt-get -y autoremove \
+#&& apt-get clean autoclean \
+&& rm -rf /var/lib/apt/lists/*
+
+ARG VULKAN_SDK_VERSION=1.3.224.1
+# Download the Vulkan SDK and extract the headers, loaders, layers and binary utilities
+RUN wget -q --show-progress \
+    --progress=bar:force:noscroll \
+    https://sdk.lunarg.com/sdk/download/${VULKAN_SDK_VERSION}/linux/vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.gz \
+    -O /tmp/vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.gz \ 
+    && echo "Installing Vulkan SDK ${VULKAN_SDK_VERSION}" \
+    && mkdir -p /opt/vulkan \
+    && tar -xf /tmp/vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.gz -C /opt/vulkan \
+    && mkdir -p /usr/local/include/ && cp -ra /opt/vulkan/${VULKAN_SDK_VERSION}/x86_64/include/* /usr/local/include/ \
+    && mkdir -p /usr/local/lib && cp -ra /opt/vulkan/${VULKAN_SDK_VERSION}/x86_64/lib/* /usr/local/lib/ \
+    && cp -a /opt/vulkan/${VULKAN_SDK_VERSION}/x86_64/lib/libVkLayer_*.so /usr/local/lib \
+    && mkdir -p /usr/local/share/vulkan/explicit_layer.d \
+    && cp /opt/vulkan/${VULKAN_SDK_VERSION}/x86_64/etc/vulkan/explicit_layer.d/VkLayer_*.json /usr/local/share/vulkan/explicit_layer.d \
+    && mkdir -p /usr/local/share/vulkan/registry \
+    && cp -a /opt/vulkan/${VULKAN_SDK_VERSION}/x86_64/share/vulkan/registry/* /usr/local/share/vulkan/registry \
+    && cp -a /opt/vulkan/${VULKAN_SDK_VERSION}/x86_64/bin/* /usr/local/bin \
+    && ldconfig \
+    && rm /tmp/vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.gz && rm -rf /opt/vulkan
+
+# Setup the required capabilities for the container runtime    
+ENV NVIDIA_VISIBLE_DEVICES=all NVIDIA_DRIVER_CAPABILITIES=all
+
+# Open ports for live streaming
+EXPOSE 47995-48012/udp \
+       47995-48012/tcp \
+       49000-49007/udp \
+       49000-49007/tcp \
+       49100/tcp \
+       8011/tcp \
+       8012/tcp \
+       8211/tcp \
+       8899/tcp \
+       8891/tcp
+
+ENV OMNI_SERVER http://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/2022.1
+# ENV OMNI_SERVER omniverse://localhost/NVIDIA/Assets/Isaac/2022.1
+# ENV OMNI_USER admin
+# ENV OMNI_PASS admin
+ENV MIN_DRIVER_VERSION 470.141.03
+
+COPY --from=isaac-sim /isaac-sim /isaac-sim
+RUN  chown -R robolaunch:robolaunch /isaac-sim
+WORKDIR /isaac-sim
+RUN ln -s exts/omni.isaac.examples/omni/isaac/examples extension_examples
+RUN echo '' > vulkan_check.sh
+RUN apt-get install -y software-properties-common apt-transport-https wget
+RUN wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+RUN add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+RUN apt-get install -y code
+CMD ["/bin/bash" "-c" "/etc/vdi/generate-xorg.sh && supervisord -c /etc/vdi/supervisord.conf"]

@@ -1,0 +1,10 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+ARG AUTOWARE_VERSION
+FROM robolaunchio/devspace-simulation:autoware-${AUTOWARE_VERSION}-focal-xfce-0.1.1-intmed
+USER root
+COPY --from=build /etc/vdi/ /etc/vdi/
+USER robolaunch
+RUN rm -rf /home/robolaunch/.cache
+WORKDIR /home/robolaunch
+USER root

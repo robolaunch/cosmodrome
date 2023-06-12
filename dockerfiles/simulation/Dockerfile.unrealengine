@@ -1,0 +1,12 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+ARG UNREALENGINE_VERSION
+RUN apt-get update && apt-get install -y unzip
+USER robolaunch
+WORKDIR /home/robolaunch/
+RUN wget https://nexus.robolaunch.cloud/repository/download/Linux_Unreal_Engine_${UNREALENGINE_VERSION}.zip
+RUN unzip /home/robolaunch/Linux_Unreal_Engine_${UNREALENGINE_VERSION}.zip -d /home/robolaunch/unreal
+RUN rm /home/robolaunch/Linux_Unreal_Engine_${UNREALENGINE_VERSION}.zip
+USER root
+RUN apt-get install -y pyqt5-dev-tools
+WORKDIR /home/robolaunch/unreal

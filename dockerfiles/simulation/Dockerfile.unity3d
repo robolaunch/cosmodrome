@@ -1,0 +1,9 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+ARG UNITY3D_VERSION
+FROM devspace-simulation:unity3d-${UNITY3D_VERSION}-focal-xfce
+USER root
+COPY --from=build /etc/vdi/ /etc/vdi/
+USER robolaunch
+RUN rm -rf /home/robolaunch/.cache
+WORKDIR /home/robolaunch

@@ -1,0 +1,19 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+ARG PYBULLET_VERSION
+USER root
+ENV cudnn_version=8.2.4.15-1+cuda11.4
+RUN apt-get update
+RUN apt-get install -y git build-essential libopencv-dev python3-opencv vim mlocate python3-pip python3-venv python3-dev python-is-python3
+RUN wget https://nexus.robolaunch.cloud/repository/download/cuda_11.4.1_470.57.02_linux.run 
+RUN bash cuda_11.4.1_470.57.02_linux.run --silent --toolkit
+RUN apt-get install -y libcudnn8=${cudnn_version} libcudnn8-dev=${cudnn_version}
+RUN apt-mark hold libcudnn8 libcudnn8-dev
+USER robolaunch
+ENV PATH $PATH:/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin
+ENV PYTHONPATH "/home/robolaunch/.local/lib/python3.8/:${PYTHONPATH}"
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+RUN python3.8 -m pip install notebook pybullet==${PYBULLET_VERSION}
+WORKDIR /home/robolaunch
+USER root

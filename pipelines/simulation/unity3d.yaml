@@ -1,0 +1,15 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: unity3d
+  image:
+    repository: devspace-simulation
+    tag: unity3d-2021.3.24f1-focal-xfce
+  path: "dockerfiles/simulation"
+  dockerfile: "Dockerfile.unity3d"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "UNITY3D_VERSION": "2021.3.24f1"
+  push: false
