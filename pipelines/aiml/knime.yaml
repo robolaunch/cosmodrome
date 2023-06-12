@@ -1,0 +1,16 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: knime
+  image:
+    repository: devspace-aiml
+    tag: knime-4.7.3.linux.gtk.x86_64-1ubuntu4-focal-xfce
+  path: "dockerfiles/aiml"
+  dockerfile: "Dockerfile.knime"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "KNIME_VERSION": "4.7.3.linux.gtk.x86_64"
+    "KNIME_VERSION_SHORT": "4.7.3"
+  push: false

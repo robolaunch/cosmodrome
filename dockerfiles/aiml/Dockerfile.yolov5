@@ -1,0 +1,29 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+ARG YOLOV5_VERSION
+USER root
+ENV os=ubuntu2004
+ENV cuda_version_dashed=11-4
+ENV cudnn_version=8.2.4.15-1+cuda11.4
+ENV PATH=$PATH:/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin
+RUN apt-get update
+RUN apt-get install -y git build-essential libopencv-dev python3-opencv vim mlocate python3-pip
+RUN wget https://nexus.robolaunch.cloud/repository/download/cuda_11.4.1_470.57.02_linux.run
+RUN apt-get install -y libcudnn8=${cudnn_version} libcudnn8-dev=${cudnn_version}
+RUN apt-mark hold libcudnn8 libcudnn8-dev
+RUN echo 'export PATH=$PATH/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin' >> ~/.bashrc
+ENV PATH=$PATH/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin
+RUN sudo bash cuda_11.4.1_470.57.02_linux.run --silent --toolkit
+USER robolaunch
+ENV PATH=$PATH:/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin
+WORKDIR /home/robolaunch
+RUN git clone -b ${YOLOV5_VERSION} https://github.com/ultralytics/yolov5.git
+WORKDIR /home/robolaunch/yolov5
+RUN pip3 install urllib3==1.26.11
+RUN pip3 install sentry-sdk==1.22.2
+RUN pip3 install testresources
+RUN pip3 install launchpadlib
+RUN pip3 install -U -r requirements.txt
+#RUN python3 detect.py --source ./data/images/zidane.jpg --weights yolov5s.pt --conf 0.4
+WORKDIR /home/robolaunch/
+USER root
