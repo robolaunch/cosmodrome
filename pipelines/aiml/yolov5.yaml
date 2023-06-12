@@ -6,7 +6,7 @@ steps:
 - name: yolov5
   image:
     repository: devspace-aiml
-    tag: yolov5-v7.0-1ubuntu4-focal-xfce
+    tag: yolov5-v7.0-focal-xfce
   path: "dockerfiles/aiml"
   dockerfile: "Dockerfile.yolov5"
   buildArgs:

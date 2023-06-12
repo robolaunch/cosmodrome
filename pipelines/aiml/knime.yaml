@@ -6,7 +6,7 @@ steps:
 - name: knime
   image:
     repository: devspace-aiml
-    tag: knime-4.7.3.linux.gtk.x86_64-1ubuntu4-focal-xfce
+    tag: knime-4.7.3.linux.gtk.x86_64-focal-xfce
   path: "dockerfiles/aiml"
   dockerfile: "Dockerfile.knime"
   buildArgs:
