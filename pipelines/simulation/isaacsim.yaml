@@ -1,0 +1,15 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: isaacsim
+  image:
+    repository: devspace-simulation
+    tag: isaacsim-2022.1.1-focal-xfce
+  path: "dockerfiles/simulation"
+  dockerfile: "Dockerfile.isaacsim"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "ISAACSIM_VERSION": "2022.1.1"
+  push: false
