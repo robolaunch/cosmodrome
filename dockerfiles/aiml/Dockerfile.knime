@@ -1,0 +1,11 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+ARG KNIME_VERSION
+ARG KNIME_VERSION_SHORT
+RUN apt-get update && apt-get install -y libwebkit2gtk-4.0-37
+USER robolaunch
+WORKDIR /home/robolaunch
+RUN wget https://download.knime.org/analytics-platform/linux/knime_${KNIME_VERSION}.tar.gz
+RUN tar xvfz knime_${KNIME_VERSION}.tar.gz
+WORKDIR /home/robolaunch/knime-${KNIME_VERSION_SHORT}
+USER root

@@ -1,0 +1,15 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: pytorch
+  image:
+    repository: devspace-aiml
+    tag: pytorch-2.0.1-1ubuntu4-focal-xfce
+  path: "dockerfiles/aiml"
+  dockerfile: "Dockerfile.pytorch"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "PYTORCH_VERSION": "2.0.1"
+  push: false
