@@ -1,0 +1,11 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+ARG GOLANG_VERSION
+RUN curl -OL https://golang.org/dl/go${GOLANG_VERSION}.tar.gz
+RUN tar -C /usr/local -xvf go${GOLANG_VERSION}.tar.gz
+USER robolaunch
+ENV PATH $PATH:/usr/local/go/bin
+RUN echo "export PATH=$PATH:/usr/local/go/bin" >> /home/robolaunch/.bashrc
+WORKDIR /home/robolaunch
+USER root
+
