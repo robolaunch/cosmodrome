@@ -1,0 +1,15 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: php
+  image:
+    repository: devspace-dev
+    tag: php-2-7.4-75-focal-xfce
+  path: "dockerfiles/dev"
+  dockerfile: "Dockerfile.php"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "PHP_VERSION": "2:7.4+75"
+  push: false

@@ -1,0 +1,15 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: nodejs
+  image:
+    repository: devspace-dev
+    tag: nodejs-18.16.0-focal-xfce
+  path: "dockerfiles/dev"
+  dockerfile: "Dockerfile.nodejs"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "NODEJS_VERSION": "18.16.0"
+  push: false

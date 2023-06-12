@@ -1,0 +1,15 @@
+name: vdi-build
+registry: docker.io
+organization: robolaunchio
+version: 0.1.1
+steps:
+- name: openjdk
+  image:
+    repository: devspace-dev
+    tag: openjdk-11-jdk-focal-xfce
+  path: "dockerfiles/dev"
+  dockerfile: "Dockerfile.openjdk"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.1"
+    "OPENJDK_VERSION": "11-jdk"
+  push: false
