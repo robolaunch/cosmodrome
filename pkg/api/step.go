@@ -33,14 +33,15 @@ func (step *Step) Default(lc LaunchConfig) {
 }
 
 func (step *Step) setImageName(lc LaunchConfig) {
-	step.Image.Name = lc.Registry + "/" + lc.Organization + "/" + step.Image.Repository + ":" + formatTag(step.Image.Tag) + "-" + lc.Version
+	step.Image.Name = lc.Registry + "/" + lc.Organization + "/" + step.Image.Repository + ":" + FormatTag(step.Image.Tag) + "-" + lc.Version
 }
 
-func formatTag(tag string) string {
+func FormatTag(tag string) string {
 	// no "+" is allowed
 	// no "~" is allowed
 	tag = strings.ReplaceAll(tag, "+", "-")
 	tag = strings.ReplaceAll(tag, "~", "-")
+	tag = strings.ReplaceAll(tag, ":", "-")
 	return tag
 }
 
