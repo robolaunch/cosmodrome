@@ -379,6 +379,9 @@ register_me () {
     
     # SKIP_PLATFORM is not set
     if [[ -z "${SKIP_PLATFORM}" ]]; then
+        # register cloud instance DNS to enable access over cloud instance 
+        curl -vk --resolve $CLOUD_INSTANCE_ALIAS.robolaunch.cloud:6443:127.0.0.1  https://$CLOUD_INSTANCE_ALIAS.robolaunch.cloud:6443/ping;
+        # set credentials for federation
         echo $CLOUD_INSTANCE_CA | base64 --decode >> /tmp/ca.crt;
         kubectl config set-cluster cloud-instance --server=$CLOUD_INSTANCE_API_SERVER --certificate-authority=/tmp/ca.crt --embed-certs=true 2>/dev/null 1>/dev/null;
         kubectl config set-credentials $CLOUD_INSTANCE_USER --token=$CLOUD_INSTANCE_OAUTH_TOKEN 2>/dev/null 1>/dev/null;
