@@ -264,6 +264,32 @@ update_helm_repositories () {
     helm repo update;
 }
 
+create_admin_crb () {
+	echo "kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: $ORGANIZATION-admin-role
+rules:
+  - apiGroups: ['*']
+    resources: ['*']
+    verbs: ['*']
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: $ORGANIZATION-admin-crb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: $ORGANIZATION-admin-role
+subjects:
+- kind: User
+  name: $OIDC_URL#$CLOUD_INSTANCE_USER
+  apiGroup: rbac.authorization.k8s.io" > crb.yaml;
+	kubectl create -f crb.yaml;
+	rm -rf crb.yaml;
+}
+
 install_openebs () {
     print_log "Installing openebs... This might take around one minute.";
     helm upgrade -i openebs openebs/openebs \
@@ -460,6 +486,9 @@ print_global_log "Labeling node...";
 
 print_global_log "Updating Helm repositories...";
 (update_helm_repositories)
+
+print_global_log "Creating admin crb...";
+(create_admin_crb)
 
 print_global_log "Installing openebs...";
 (install_openebs)
