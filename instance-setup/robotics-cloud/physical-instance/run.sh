@@ -230,10 +230,23 @@ install_post_tools () {
 
 set_up_k3s () {
     print_log "Setting up k3s...";
-    curl -sfL https://get.k3s.io | \
+
+
+    if [[ -z "${SKIP_PLATFORM}" ]]; then
+
+        curl -sfL https://get.k3s.io | \
+        INSTALL_K3S_VERSION=$K3S_VERSION+k3s1 \
+        K3S_KUBECONFIG_MODE="644" \
+        INSTALL_K3S_EXEC="  --cluster-cidr=$DESIRED_CLUSTER_CIDR --service-cidr=$DESIRED_SERVICE_CIDR    --cluster-domain=$PHYSICAL_INSTANCE.local --disable-network-policy --disable=traefik --disable=local-storage --kube-apiserver-arg oidc-issuer-url=$OIDC_URL --kube-apiserver-arg oidc-client-id=$OIDC_ORGANIZATION_CLIENT_ID --kube-apiserver-arg oidc-username-claim=preferred_username --kube-apiserver-arg oidc-groups-claim=groups" sh -;
+
+    else
+
+        curl -sfL https://get.k3s.io | \
         INSTALL_K3S_VERSION=$K3S_VERSION+k3s1 \
         K3S_KUBECONFIG_MODE="644" \
         INSTALL_K3S_EXEC="  --cluster-cidr=$DESIRED_CLUSTER_CIDR --service-cidr=$DESIRED_SERVICE_CIDR    --cluster-domain=$PHYSICAL_INSTANCE.local --disable-network-policy --disable=traefik --disable=local-storage" sh -;
+
+    fi
     sleep 5;
 }
 
@@ -265,7 +278,9 @@ update_helm_repositories () {
 }
 
 create_admin_crb () {
-	echo "kind: ClusterRole
+
+    if [[ -z "${SKIP_PLATFORM}" ]]; then
+	    echo "kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: $ORGANIZATION-admin-role
@@ -286,8 +301,9 @@ subjects:
 - kind: User
   name: $OIDC_URL#$CLOUD_INSTANCE_USER
   apiGroup: rbac.authorization.k8s.io" > crb.yaml;
-	kubectl create -f crb.yaml;
-	rm -rf crb.yaml;
+        kubectl create -f crb.yaml;
+        rm -rf crb.yaml;
+    fi
 }
 
 install_openebs () {
