@@ -380,6 +380,32 @@ spec:
 EOF
 }
 
+deploy_metrics_exporter () {
+    cat << EOF | kubectl apply -f -
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedMetricsExporter
+metadata:
+  name: metrics-exporter
+  namespace: metrics
+spec:
+  template:
+    spec:
+      gpu:
+        track: true
+        interval: 5
+      network:
+        track: true
+        interval: 3
+        interfaces:
+        - lo
+        - docker0
+        - cni0
+  placement:
+    clusters:
+    - name: $CLOUD_INSTANCE
+EOF
+}
+
 print_global_log "Waiting for the preflight checks...";
 (check_if_root)
 (install_pre_tools)
