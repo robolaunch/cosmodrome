@@ -19,6 +19,7 @@ NC='\033[0m';
 ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
+METRICS_NAMESPACE="metrics"
 
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
@@ -350,29 +351,20 @@ deploy_connection_hub () {
     check_connection_hub_phase;
 }
 
-display_connection_hub_key () {
-    # CONNECTION_HUB_KEY=$(kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P);
-    printf "\n\n"
-    printf "Get connection hub key by running the command below:\n\n";
-    printf "kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P";
-    printf "\n\n"
-    print_log "You can use this key to establish a connection with cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
-}
-
 deploy_metrics_namespace () {
     print_log "Deploying FederatedNamespace for metrics...";
     cat << EOF | kubectl apply -f -
 apiVersion: types.kubefed.io/v1beta1
 kind: Namespace
 metadata:
-  name: metrics
+  name: $METRICS_NAMESPACE
 EOF
     cat << EOF | kubectl apply -f -
 apiVersion: types.kubefed.io/v1beta1
 kind: FederatedNamespace
 metadata:
-  name: metrics
-  namespace: metrics
+  name: $METRICS_NAMESPACE
+  namespace: $METRICS_NAMESPACE
 spec:
   placement:
     clusters:
@@ -386,7 +378,7 @@ apiVersion: types.kubefed.io/v1beta1
 kind: FederatedMetricsExporter
 metadata:
   name: metrics-exporter
-  namespace: metrics
+  namespace: $METRICS_NAMESPACE
 spec:
   template:
     spec:
@@ -404,6 +396,15 @@ spec:
     clusters:
     - name: $CLOUD_INSTANCE
 EOF
+}
+
+display_connection_hub_key () {
+    # CONNECTION_HUB_KEY=$(kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P);
+    printf "\n\n"
+    printf "Get connection hub key by running the command below:\n\n";
+    printf "kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P";
+    printf "\n\n"
+    print_log "You can use this key to establish a connection with cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
 }
 
 print_global_log "Waiting for the preflight checks...";
@@ -461,5 +462,11 @@ print_global_log "Installing robolaunch Operator Suite...";
 
 print_global_log "Deploying Connection Hub...";
 (deploy_connection_hub)
+
+print_global_log "Creating namespace for metrics...";
+(deploy_metrics_namespace)
+
+print_global_log "Deploying metrics exporter...";
+(deploy_metrics_exporter)
 
 display_connection_hub_key >&3
