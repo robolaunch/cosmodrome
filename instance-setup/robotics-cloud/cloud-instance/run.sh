@@ -359,6 +359,27 @@ display_connection_hub_key () {
     print_log "You can use this key to establish a connection with cloud instance $CLOUD_INSTANCE_ALIAS/$CLOUD_INSTANCE.";
 }
 
+deploy_metrics_namespace () {
+    print_log "Deploying FederatedNamespace for metrics...";
+    cat << EOF | kubectl apply -f -
+apiVersion: types.kubefed.io/v1beta1
+kind: Namespace
+metadata:
+  name: metrics
+EOF
+    cat << EOF | kubectl apply -f -
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedNamespace
+metadata:
+  name: metrics
+  namespace: metrics
+spec:
+  placement:
+    clusters:
+    - name: $CLOUD_INSTANCE
+EOF
+}
+
 print_global_log "Waiting for the preflight checks...";
 (check_if_root)
 (install_pre_tools)
