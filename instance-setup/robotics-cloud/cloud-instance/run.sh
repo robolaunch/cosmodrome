@@ -19,6 +19,7 @@ NC='\033[0m';
 ARCH=$(dpkg --print-architecture)
 TIMESTAMP=$(date +%s)
 OUTPUT_FILE="out_$TIMESTAMP.log"
+METRICS_NAMESPACE="metrics"
 
 export KUBECONFIG="/etc/rancher/k3s/k3s.yaml";
 exec 3>&1 >$OUTPUT_FILE 2>&1;
@@ -350,6 +351,53 @@ deploy_connection_hub () {
     check_connection_hub_phase;
 }
 
+deploy_metrics_namespace () {
+    print_log "Deploying FederatedNamespace for metrics...";
+    cat << EOF | kubectl apply -f -
+apiVersion: types.kubefed.io/v1beta1
+kind: Namespace
+metadata:
+  name: $METRICS_NAMESPACE
+EOF
+    cat << EOF | kubectl apply -f -
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedNamespace
+metadata:
+  name: $METRICS_NAMESPACE
+  namespace: $METRICS_NAMESPACE
+spec:
+  placement:
+    clusters:
+    - name: $CLOUD_INSTANCE
+EOF
+}
+
+deploy_metrics_exporter () {
+    cat << EOF | kubectl apply -f -
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedMetricsExporter
+metadata:
+  name: metrics-exporter
+  namespace: $METRICS_NAMESPACE
+spec:
+  template:
+    spec:
+      gpu:
+        track: true
+        interval: 5
+      network:
+        track: true
+        interval: 3
+        interfaces:
+        - lo
+        - docker0
+        - cni0
+  placement:
+    clusters:
+    - name: $CLOUD_INSTANCE
+EOF
+}
+
 display_connection_hub_key () {
     # CONNECTION_HUB_KEY=$(kubectl get connectionhub connection-hub -o jsonpath="{.status.key}" | yq -P);
     printf "\n\n"
@@ -414,5 +462,11 @@ print_global_log "Installing robolaunch Operator Suite...";
 
 print_global_log "Deploying Connection Hub...";
 (deploy_connection_hub)
+
+print_global_log "Creating namespace for metrics...";
+(deploy_metrics_namespace)
+
+print_global_log "Deploying metrics exporter...";
+(deploy_metrics_exporter)
 
 display_connection_hub_key >&3
