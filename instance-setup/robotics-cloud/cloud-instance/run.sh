@@ -361,7 +361,7 @@ federate_metrics_exporter () {
 deploy_metrics_namespace () {
     print_log "Deploying FederatedNamespace for metrics...";
     cat << EOF | kubectl apply -f -
-apiVersion: types.kubefed.io/v1beta1
+apiVersion: v1
 kind: Namespace
 metadata:
   name: $METRICS_NAMESPACE
