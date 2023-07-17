@@ -355,7 +355,7 @@ federate_metrics_exporter () {
     wget https://github.com/kubernetes-retired/kubefed/releases/download/v0.9.2/kubefedctl-0.9.2-linux-amd64.tgz;
     tar -xvzf kubefedctl-0.9.2-linux-amd64.tgz;
     mv ./kubefedctl /usr/local/bin/;
-    kubefedctl enable metricsexporters;
+    kubefedctl enable namespaces metricsexporters;
 }
 
 deploy_metrics_namespace () {
@@ -470,11 +470,11 @@ print_global_log "Installing robolaunch Operator Suite...";
 print_global_log "Deploying Connection Hub...";
 (deploy_connection_hub)
 
-print_global_log "Creating namespace for metrics...";
-(deploy_metrics_namespace)
-
 print_global_log "Federating resources...";
 (federate_metrics_exporter)
+
+print_global_log "Creating namespace for metrics...";
+(deploy_metrics_namespace)
 
 print_global_log "Deploying metrics exporter...";
 (deploy_metrics_exporter)
