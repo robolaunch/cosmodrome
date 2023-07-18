@@ -26,6 +26,7 @@ export REGION=sample-region
 export CLOUD_INSTANCE=cloud-instance
 export CLOUD_INSTANCE_ALIAS=my-first-instance
 export PHYSICAL_INSTANCE=cloudy-mini-agv
+export PHYSICAL_INSTANCE_LOCATION="Ankara, Turkey"
 export DESIRED_CLUSTER_CIDR=10.20.1.0/24 # should be unique per physical instance
 export DESIRED_SERVICE_CIDR=10.20.2.0/24 # should be unique per physical instance
 export NETWORK=External # should be `Local` if cloud instance uses desktop configuration
