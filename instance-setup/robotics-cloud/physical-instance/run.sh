@@ -124,6 +124,15 @@ set_physical_instance () {
     fi
 }
 
+set_physical_instance_location () {
+    if [[ -z "${PHYSICAL_INSTANCE_LOCATION}" ]]; then
+        print_err "Environment variable PHYSICAL_INSTANCE_LOCATION should be set.";
+    else
+        PHYSICAL_INSTANCE_LOCATION=$PHYSICAL_INSTANCE_LOCATION;
+    fi
+}
+
+
 set_desired_cluster_cidr () {
     if [[ -z "${DESIRED_CLUSTER_CIDR}" ]]; then
         print_err "Environment variable DESIRED_CLUSTER_CIDR should be set.";
@@ -182,6 +191,7 @@ check_inputs () {
     set_cloud_instance;
     set_cloud_instance_alias;
     set_physical_instance;
+    set_physical_instance_location;
     set_connection_hub_key;
     set_desired_cluster_cidr;
     set_desired_service_cidr;
@@ -266,6 +276,7 @@ label_node () {
         robolaunch.io/cloud-instance=$CLOUD_INSTANCE \
         robolaunch.io/cloud-instance-alias=$CLOUD_INSTANCE_ALIAS \
         robolaunch.io/physical-instance=$PHYSICAL_INSTANCE \
+        robolaunch.io/physical-instance-location=$PHYSICAL_INSTANCE_LOCATION \
         submariner.io/gateway="true";
 }
 
