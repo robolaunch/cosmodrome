@@ -1,7 +1,7 @@
 name: galactic
 registry: docker.io
 organization: robolaunchio
-version: 0.1.3
+version: 0.1.4
 steps:
 - name: galactic
   image:
@@ -10,7 +10,7 @@ steps:
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
   buildArgs: 
-    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.3"
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.4"
     "ROS_DISTRO_CODE": "galactic"
   platforms:
   - "linux/amd64"
