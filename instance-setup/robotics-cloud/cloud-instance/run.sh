@@ -390,7 +390,7 @@ spec:
   template:
     spec:
       gpu:
-        track: true
+        track: false
         interval: 5
       network:
         track: true
@@ -402,6 +402,11 @@ spec:
   placement:
     clusters:
     - name: $CLOUD_INSTANCE
+  overrides:
+  - clusterName: $CLOUD_INSTANCE
+    clusterOverrides:
+    - path: "/spec/gpu/track"
+      value: true
 EOF
 }
 
