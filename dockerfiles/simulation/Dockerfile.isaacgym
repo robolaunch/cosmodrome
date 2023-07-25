@@ -1,0 +1,10 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} as build
+ARG ISAACGYM_VERSION
+
+SHELL ["/bin/bash", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Isaac Gym installation steps
+
+WORKDIR /home/robolaunch
