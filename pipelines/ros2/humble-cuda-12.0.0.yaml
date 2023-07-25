@@ -1,4 +1,4 @@
-name: humble-cuda-11.7.1
+name: humble-cuda-12.0.0
 registry: docker.io
 organization: robolaunchio
 version: 0.1.4
@@ -6,9 +6,9 @@ steps:
 - name: humble
   image:
     repository: devspace-robotics
-    tag: ros2-humble-jammy-xfce-cuda-11.7.1
+    tag: ros2-humble-jammy-xfce-cuda-12.0.0
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
-  buildArgs: 
-    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-amd64-cuda-11.7.1-0.1.4"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-amd64-cuda-12.0.0-0.1.4"
     "ROS_DISTRO_CODE": "humble"
