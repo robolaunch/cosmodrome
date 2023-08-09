@@ -1,0 +1,39 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+ARG ISAACGYM_VERSION="Preview_4"
+ARG ISAACGYM_PATH
+ARG REPOSITORY_PATH="/var/lib/repositories"
+
+SHELL ["/bin/bash", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+COPY ${ISAACGYM_PATH}/IsaacGym_Preview_${ISAACGYM_VERSION}_Package.tar.gz .
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install ninja-build; \
+    pip install numpy==1.23.3; \
+    pip install tensorboard
+
+RUN mkdir -p ${REPOSITORY_PATH}
+
+RUN set -eux; \
+    tar -xzvf IsaacGym_Preview_${ISAACGYM_VERSION}_Package.tar.gz; \
+    cd isaacgym/python/; \
+    apt-get install python3-pip; \
+    pip install -e .
+
+WORKDIR ${REPOSITORY_PATH}
+
+RUN set -eux; \
+    git clone https://github.com/leggedrobotics/rsl_rl.git; \
+    cd rsl_rl; \
+    pip install -e .
+
+RUN set -eux; \
+    git clone https://github.com/leggedrobotics/legged_gym.git; \
+    cd legged_gym; \
+    pip install -e .
+
+WORKDIR /home/robolaunch

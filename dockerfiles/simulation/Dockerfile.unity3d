@@ -1,9 +1,14 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as build
 ARG UNITY3D_VERSION
-FROM devspace-simulation:unity3d-${UNITY3D_VERSION}-focal-xfce
-USER root
-COPY --from=build /etc/vdi/ /etc/vdi/
-USER robolaunch
-RUN rm -rf /home/robolaunch/.cache
+
+SHELL ["/bin/bash", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN set -eux; \
+    sh -c 'echo "deb https://hub.unity3d.com/linux/repos/deb stable main" > /etc/apt/sources.list.d/unityhub.list'; \
+    wget -qO - https://hub.unity3d.com/linux/keys/public | apt-key add -; \
+    apt-get update; \
+    apt-get install -y unityhub=${UNITY3D_VERSION}
+    
 WORKDIR /home/robolaunch
