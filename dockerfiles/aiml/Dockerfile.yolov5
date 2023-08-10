@@ -17,8 +17,9 @@ RUN mkdir -p ${REPOSITORY_PATH}/yolov5
 WORKDIR ${REPOSITORY_PATH}/yolov5
 RUN git clone -b ${YOLOV5_VERSION} https://github.com/ultralytics/yolov5.git
 WORKDIR ${REPOSITORY_PATH}/yolov5/yolov5
+USER robolaunch
 RUN set -eux; \
     pip3 install urllib3==1.26.11 sentry-sdk==1.22.2 testresources launchpadlib && \
     pip3 install -U -r requirements.txt
-USER robolaunch
 WORKDIR /home/robolaunch/
+USER root
