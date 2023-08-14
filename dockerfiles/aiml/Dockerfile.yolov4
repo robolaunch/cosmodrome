@@ -21,6 +21,6 @@ WORKDIR ${REPOSITORY_PATH}/yolov4/darknet
 RUN sed -i 's/GPU=0/GPU=1/' Makefile && \
     sed -i 's/CUDNN=0/CUDNN=1/' Makefile && \
     sed -i 's/OPENCV=0/OPENCV=1/' Makefile && \
-    sed -i 's/# ARCH= -gencode arch=compute_75/ARCH= -gencode arch=compute_75/' Makefile
-RUN wget https://github.com/AlexeyAB/darknet/releases/download/yolov4/yolov4.weights
+    sed -i 's/# ARCH= -gencode arch=compute_75/ARCH= -gencode arch=compute_75/' Makefile && \
+    make
 WORKDIR /home/robolaunch
