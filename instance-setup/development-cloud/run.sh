@@ -273,18 +273,18 @@ install_cert_manager () {
     sleep 30;
 }
 
-install_devspace_operator () {
-    print_log "Installing DevSpace Operator Helm chart... This might take around one minute."
+install_robot_operator () {
+    print_log "Installing Robot Operator Helm chart... This might take around one minute."
 
-    DO_HELM_INSTALL_SUCCEEDED="false"
-    while [ "$DO_HELM_INSTALL_SUCCEEDED" != "true" ]
+    RO_HELM_INSTALL_SUCCEEDED="false"
+    while [ "$RO_HELM_INSTALL_SUCCEEDED" != "true" ]
     do 
-        DO_HELM_INSTALL_SUCCEEDED="true"
+        RO_HELM_INSTALL_SUCCEEDED="true"
         helm upgrade -i \
-            devspace-operator robolaunch/devspace-operator \
-            --namespace devspace-system \
+            robot-operator robolaunch/robot-operator \
+            --namespace robot-system \
             --create-namespace \
-            --version $DEVSPACE_OPERATOR_CHART_VERSION || DO_HELM_INSTALL_SUCCEEDED="false";
+            --version $ROBOT_OPERATOR_CHART_VERSION || RO_HELM_INSTALL_SUCCEEDED="false";
         sleep 1;
     done
 
@@ -308,7 +308,7 @@ fi
 VERSION_SELECTOR_STR='.versions[] | select(.version == "'"$PLATFORM_VERSION"'")'
 K3S_VERSION=v$(yq ''"${VERSION_SELECTOR_STR}"' | .devCloud.kubernetes.version' < platform.yaml)
 CERT_MANAGER_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .devCloud.kubernetes.components.cert-manager.version' < platform.yaml)
-DEVSPACE_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .devCloud.kubernetes.operators.devspace.helm.version' < platform.yaml)
+ROBOT_OPERATOR_CHART_VERSION=$(yq ''"${VERSION_SELECTOR_STR}"' | .roboticsCloud.kubernetes.operators.robot.helm.version' < platform.yaml)
 
 opening >&3
 (check_inputs)
@@ -343,7 +343,7 @@ print_global_log "Installing NVIDIA device plugin...";
 print_global_log "Installing cert-manager...";
 (install_cert_manager)
 
-print_global_log "Installing robolaunch DevSpace Operator...";
-(install_devspace_operator)
+print_global_log "Installing robolaunch Robot Operator...";
+(install_robot_operator)
 
 display_ending_msg >&3
