@@ -10,8 +10,6 @@ ENV PATH=$PATH:/usr/local/cuda-12.0/bin:/home/robolaunch/.local/bin
 RUN echo 'export PATH=$PATH/usr/local/cuda-12.0/bin:/home/robolaunch/.local/bin' >> ~/.bashrc
 RUN set -eux; \
     apt-get update && \
-    apt-get install -y git build-essential python3-pip && \
-    apt-get install -y libcudnn8=${cudnn_version} libcudnn8-dev=${cudnn_version} && \
     apt-mark hold libcudnn8 libcudnn8-dev
 USER robolaunch 
 RUN mkdir -p ${REPOSITORY_PATH}/yolov7
