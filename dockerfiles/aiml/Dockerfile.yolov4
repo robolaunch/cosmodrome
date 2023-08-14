@@ -21,4 +21,5 @@ RUN sed -i 's/GPU=0/GPU=1/' Makefile && \
     sed -i 's/OPENCV=0/OPENCV=1/' Makefile && \
     sed -i 's/# ARCH= -gencode arch=compute_75/ARCH= -gencode arch=compute_75/' Makefile && \
     make
+USER root
 WORKDIR /home/robolaunch

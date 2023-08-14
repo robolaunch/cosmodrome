@@ -17,4 +17,5 @@ WORKDIR ${REPOSITORY_PATH}/yolov7
 RUN git clone -b ${YOLOV7_VERSION} https://github.com/WongKinYiu/yolov7.git
 WORKDIR ${REPOSITORY_PATH}/yolov7/yolov7
 RUN pip3 install -U -r requirements.txt
+USER root
 WORKDIR /home/robolaunch

@@ -20,4 +20,5 @@ USER robolaunch
 RUN set -eux; \
     pip3 install urllib3==1.26.11 sentry-sdk==1.22.2 testresources launchpadlib && \
     pip3 install -U -r requirements.txt
+USER root
 WORKDIR /home/robolaunch/
