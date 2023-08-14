@@ -3,13 +3,23 @@ registry: docker.io
 organization: robolaunchio
 version: 0.1.5
 steps:
+- name: opencv
+  image:
+    repository: devspace-aiml-libs
+    tag: opencv-4.8.0-focal-xfce
+  path: "dockerfiles/aiml/libs"
+  dockerfile: "Dockerfile.opencv"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-cudnn-xfce-amd64-0.1.5"
+    "OPENCV_VERSION": "4.8.0"
+  push: false
 - name: yolov7
+  baseStep: opencv
   image:
     repository: devspace-aiml
     tag: yolov7-main-focal-xfce
   path: "dockerfiles/aiml"
   dockerfile: "Dockerfile.yolov7"
   buildArgs:
-    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.5"
     "YOLOV7_VERSION": "main"
   push: false
