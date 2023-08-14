@@ -1,7 +1,7 @@
 name: yolov5
 registry: docker.io
 organization: robolaunchio
-version: 0.1.4
+version: 0.1.5
 steps:
 - name: yolov5
   image:
@@ -10,6 +10,6 @@ steps:
   path: "dockerfiles/aiml"
   dockerfile: "Dockerfile.yolov5"
   buildArgs:
-    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.4"
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.5"
     "YOLOV5_VERSION": "v7.0"
   push: false
