@@ -1,24 +1,22 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as build
 ARG YOLOV7_VERSION
+ARG REPOSITORY_PATH="/home/robolaunch/repositories"
 USER root
 ENV os=ubuntu2004
-ENV cuda_version_dashed=11-4
-ENV cudnn_version=8.2.4.15-1+cuda11.4
-ENV PATH=$PATH:/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin
-RUN apt-get update
-RUN apt-get install -y git build-essential libopencv-dev python3-opencv vim mlocate python3-pip
-RUN wget https://nexus.robolaunch.cloud/repository/download/cuda_11.4.1_470.57.02_linux.run
-RUN apt-get install -y libcudnn8=${cudnn_version} libcudnn8-dev=${cudnn_version}
-RUN apt-mark hold libcudnn8 libcudnn8-dev
-RUN echo 'export PATH=$PATH/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin' >> ~/.bashrc
-ENV PATH=$PATH/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin
-RUN sudo bash cuda_11.4.1_470.57.02_linux.run --silent --toolkit
-USER robolaunch
-ENV PATH=$PATH:/usr/local/cuda-11.4/bin:/home/robolaunch/.local/bin
-WORKDIR /home/robolaunch/
+ENV cuda_version_dashed=12-0
+ENV cudnn_version=8.8.1.3-1+cuda12.0
+ENV PATH=$PATH:/usr/local/cuda-12.0/bin:/home/robolaunch/.local/bin
+RUN echo 'export PATH=$PATH/usr/local/cuda-12.0/bin:/home/robolaunch/.local/bin' >> ~/.bashrc
+RUN set -eux; \
+    apt-get update && \
+    apt-get install -y git build-essential python3-pip && \
+    apt-get install -y libcudnn8=${cudnn_version} libcudnn8-dev=${cudnn_version} && \
+    apt-mark hold libcudnn8 libcudnn8-dev
+USER robolaunch 
+RUN mkdir -p ${REPOSITORY_PATH}/yolov7
+WORKDIR ${REPOSITORY_PATH}/yolov7
 RUN git clone -b ${YOLOV7_VERSION} https://github.com/WongKinYiu/yolov7.git
-WORKDIR /home/robolaunch/yolov7
+WORKDIR ${REPOSITORY_PATH}/yolov7/yolov7
 RUN pip3 install -U -r requirements.txt
 WORKDIR /home/robolaunch
-USER root

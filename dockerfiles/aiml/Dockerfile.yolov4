@@ -10,16 +10,17 @@ ENV PATH=$PATH:/usr/local/cuda-12.0/bin:/home/robolaunch/.local/bin
 RUN echo 'export PATH=$PATH/usr/local/cuda-12.0/bin:/home/robolaunch/.local/bin' >> ~/.bashrc
 RUN set -eux; \
     apt-get update && \
-    apt-get install -y git build-essential libopencv-dev python3-opencv vim mlocate python3-pip && \
+    apt-get install -y git build-essential python3-pip && \
     apt-get install -y libcudnn8=${cudnn_version} libcudnn8-dev=${cudnn_version} && \
     apt-mark hold libcudnn8 libcudnn8-dev
+USER robolaunch
 RUN mkdir -p ${REPOSITORY_PATH}/yolov4
 WORKDIR ${REPOSITORY_PATH}/yolov4
 RUN git clone -b ${YOLOV4_VERSION} https://github.com/AlexeyAB/darknet.git
 WORKDIR ${REPOSITORY_PATH}/yolov4/darknet
-RUN sed -i 's/GPU=0/GPU=1/' Makefile
-RUN sed -i 's/CUDNN=0/CUDNN=1/' Makefile
-RUN sed -i 's/OPENCV=0/OPENCV=1/' Makefile
-RUN sed -i 's/# ARCH= -gencode arch=compute_75/ARCH= -gencode arch=compute_75/' Makefile
-RUN wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights
+RUN sed -i 's/GPU=0/GPU=1/' Makefile && \
+    sed -i 's/CUDNN=0/CUDNN=1/' Makefile && \
+    sed -i 's/OPENCV=0/OPENCV=1/' Makefile && \
+    sed -i 's/# ARCH= -gencode arch=compute_75/ARCH= -gencode arch=compute_75/' Makefile
+RUN wget https://github.com/AlexeyAB/darknet/releases/download/yolov4/yolov4.weights
 WORKDIR /home/robolaunch
