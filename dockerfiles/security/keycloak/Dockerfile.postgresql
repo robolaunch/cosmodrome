@@ -1,0 +1,13 @@
+FROM quay.io/robolaunchio/platform-initial:postgres-13.8-alpine
+
+RUN apk update && apk upgrade \
+    libxml2 \
+    libcom_err \
+    ncurses-terminfo-base \
+    libssl1.1 \
+    krb5-libs \
+    libcrypto1.1 \
+    ncurses-libs
+
+CMD ["postgres"]
+    
