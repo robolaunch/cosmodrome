@@ -1,4 +1,4 @@
-FROM quay.io/openebs/provisioner-localpv:3.4.0
+FROM quay.io/robolaunchio/platform-initial:provisioner-localpv-3.4.0
 
 RUN apk update && apk upgrade zlib
 RUN apk info | grep zlib* | xargs apk version
