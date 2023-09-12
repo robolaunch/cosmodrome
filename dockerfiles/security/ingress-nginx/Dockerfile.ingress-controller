@@ -1,0 +1,12 @@
+FROM quay.io/robolaunchio/platform-initial:v1.8.1-ingress-controller
+
+USER root
+
+RUN apk update && apk upgrade \
+    busybox \
+    busybox-binsh \
+    ssl_client 
+
+USER www-data
+
+CMD ["/nginx-ingress-controller"]
