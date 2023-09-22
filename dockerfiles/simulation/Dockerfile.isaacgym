@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE}
 
 ARG ISAACGYM_VERSION="Preview_4"
 ARG ISAACGYM_PATH
-ARG REPOSITORY_PATH="/var/lib/repositories"
+ARG REPOSITORY_PATH="/home/robolaunch/repositories"
 
 SHELL ["/bin/bash", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
@@ -34,6 +34,11 @@ RUN set -eux; \
 RUN set -eux; \
     git clone https://github.com/leggedrobotics/legged_gym.git; \
     cd legged_gym; \
+    pip install -e .
+
+RUN set -eux; \
+    git clone https://github.com/Improbable-AI/walk-these-ways.git; \
+    cd walk-these-ways; \
     pip install -e .
 
 WORKDIR /home/robolaunch
