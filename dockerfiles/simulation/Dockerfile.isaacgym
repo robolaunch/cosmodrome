@@ -12,7 +12,7 @@ COPY ${ISAACGYM_PATH}/IsaacGym_Preview_${ISAACGYM_VERSION}_Package.tar.gz .
 
 RUN set -eux; \
     apt-get update; \
-    apt-get install ninja-build; \
+    apt install -y libcurl4-openssl-dev libssl-dev ninja-build libglib2.0-dev; \
     pip install numpy==1.23.3; \
     pip install tensorboard
 
@@ -40,5 +40,38 @@ RUN set -eux; \
     git clone https://github.com/Improbable-AI/walk-these-ways.git; \
     cd walk-these-ways; \
     pip install -e .
+
+########################################################### 
+# FOR PHYSICAL ROBOT
+########################################################### 
+# Boost installation
+RUN set -eux; \
+    wget https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.gz; \
+    tar xzvf boost_1_82_0.tar.gz; \
+    apt-get install -y build-essential g++ autotools-dev libicu-dev libbz2-dev libboost-all-dev; \
+    cd boost_1_82_0/; \
+    ./bootstrap.sh --prefix=/usr/; \
+    ./b2
+
+# LCM installation
+RUN set -eux; \
+    wget https://github.com/lcm-proj/lcm/archive/refs/tags/v1.5.0.tar.gz; \
+    tar zxvf v1.5.0.tar.gz; \
+    cd lcm-1.5.0/; \
+    mkdir build; \
+    cd build/; \
+    cmake ..; \
+    make; \
+    make install; \
+    pip install lcm
+
+# Unitree SDK installation
+RUN set -eux; \
+    git clone https://github.com/unitreerobotics/unitree_legged_sdk.git -b v3.2; \
+    cd unitree_legged_sdk/; \
+    mkdir build; \
+    cd build/; \
+    cmake ..; \
+    make
 
 WORKDIR /home/robolaunch
