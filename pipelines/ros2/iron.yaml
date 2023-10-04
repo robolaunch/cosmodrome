@@ -1,7 +1,7 @@
 name: iron
 registry: docker.io
 organization: robolaunchio
-version: 0.1.4
+version: 0.1.8
 steps:
 - name: iron
   image:
@@ -10,7 +10,7 @@ steps:
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
   buildArgs: 
-    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.4"
+    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.8"
     "ROS_DISTRO_CODE": "iron"
   platforms:
   - "linux/amd64"
