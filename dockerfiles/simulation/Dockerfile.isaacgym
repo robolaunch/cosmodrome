@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE}
 
 ARG ISAACGYM_VERSION="Preview_4"
 ARG ISAACGYM_PATH
-ARG REPOSITORY_PATH="/home/robolaunch/repositories"
+ARG REPOSITORY_PATH="/opt/repositories"
 
 SHELL ["/bin/bash", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
@@ -12,7 +12,21 @@ COPY ${ISAACGYM_PATH}/IsaacGym_Preview_${ISAACGYM_VERSION}_Package.tar.gz .
 
 RUN set -eux; \
     apt-get update; \
-    apt install -y libcurl4-openssl-dev libssl-dev ninja-build libglib2.0-dev; \
+    apt install -y \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        ninja-build \
+        libglib2.0-dev \
+        unzip \
+        net-tools \
+        python3-pip \
+        build-essential \
+        g++ \
+        autotools-dev \
+        libicu-dev \
+        libbz2-dev \
+        libboost-all-dev \
+        acl; \
     pip install numpy==1.23.3; \
     pip install tensorboard
 
@@ -21,7 +35,6 @@ RUN mkdir -p ${REPOSITORY_PATH}
 RUN set -eux; \
     tar -xzvf IsaacGym_Preview_${ISAACGYM_VERSION}_Package.tar.gz; \
     cd isaacgym/python/; \
-    apt-get install python3-pip; \
     pip install -e .
 
 WORKDIR ${REPOSITORY_PATH}
@@ -48,7 +61,6 @@ RUN set -eux; \
 RUN set -eux; \
     wget https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.gz; \
     tar xzvf boost_1_82_0.tar.gz; \
-    apt-get install -y build-essential g++ autotools-dev libicu-dev libbz2-dev libboost-all-dev; \
     cd boost_1_82_0/; \
     ./bootstrap.sh --prefix=/usr/; \
     ./b2

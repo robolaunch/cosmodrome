@@ -1,7 +1,7 @@
 name: isaacgym
 registry: docker.io
 organization: robolaunchio
-version: 0.1.7
+version: 0.1.8
 steps:
 - name: isaacgym
   image:
@@ -11,7 +11,7 @@ steps:
   path: "."
   dockerfile: "Dockerfile.isaacgym"
   buildArgs:
-    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.7"
+    "BASE_IMAGE": "robolaunchio/devspace:focal-xfce-0.1.8"
     "ISAACGYM_VERSION": "4"
     "ISAACGYM_PATH": "."
   push: false
