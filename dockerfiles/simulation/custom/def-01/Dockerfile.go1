@@ -21,6 +21,7 @@ RUN set -eux; \
     pip install -e .
 
 RUN set -eux; \
-    pip install opencv-python
+    pip install opencv-python; \
+    curl -sSL http://get.gazebosim.org | sh
 
 WORKDIR /home/robolaunch

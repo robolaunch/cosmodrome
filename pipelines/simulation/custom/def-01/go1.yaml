@@ -1,16 +1,16 @@
-name: isaacgym-def-01
+name: go1-01
 registry: docker.io
 organization: robolaunchio
 version: 0.1.8
 steps:
-- name: isaacgym-def-01
+- name: go1-01
   image:
     repository: devspace-simulation
-    tag: isaacgym-4-def-01-09262023-focal-xfce
+    tag: isaacgym-4-def-01-10062023-focal-xfce
   context: dockerfiles/simulation/custom/def-01
   path: "."
-  dockerfile: "Dockerfile"
+  dockerfile: "Dockerfile.go1"
   buildArgs:
-    "BASE_IMAGE": "robolaunchio/devspace-simulation:isaacgym-4-focal-xfce-0.1.8"
+    "BASE_IMAGE": "robolaunchio/devspace-simulation:foxy-isaacgym-4-focal-xfce-0.1.8"
     "GO1_GYM_PATH": "."
   push: false
