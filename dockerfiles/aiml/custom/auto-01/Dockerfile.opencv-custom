@@ -85,4 +85,12 @@ RUN cd /root/libraries \
     && cp libdarknet.pc /usr/local/lib/pkgconfig \
     && ldconfig
 
+RUN set -eux; \
+    apt-get update && apt-get install -y \
+    net-tools \
+    opus-tools \
+    libopus-dev \
+    libgnutls28-dev \
+    librtmp-dev
+
 WORKDIR /home/robolaunch

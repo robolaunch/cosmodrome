@@ -1,15 +1,15 @@
 name: yolov4-custom-auto-01
 registry: docker.io
 organization: robolaunchio
-version: 0.1.6
+version: 0.1.9
 steps:
 - name: custom-auto-01
   image:
     repository: devspace-aiml
-    tag: custom-auto-01-09202023-focal-xfce
+    tag: custom-auto-01-10162023-focal-xfce
   path: "dockerfiles/aiml/custom/auto-01"
   dockerfile: "Dockerfile.opencv-custom"
   buildArgs:
-    "BASE_IMAGE": "robolaunchio/devspace:focal-triton-22.06-py3-xfce-amd64-0.1.6"
+    "BASE_IMAGE": "robolaunchio/devspace:focal-triton-22.06-py3-xfce-amd64-0.1.9"
     "OPENCV_VERSION": "3.4.20"
   push: false
