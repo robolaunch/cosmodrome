@@ -10,7 +10,7 @@ steps:
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
   buildArgs: 
-    "BASE_IMAGE": "robolaunchio/devspace:focal-cudnn-xfce-amd64-0.1.9"
+    "BASE_IMAGE": "robolaunchio/devspace:focal-cuda11.8-cudnn-xfce-amd64-0.1.9"
     "ROS_DISTRO_CODE": "foxy"
   push: false
 - name: isaacgym
@@ -29,7 +29,7 @@ steps:
   baseStep: isaacgym
   image:
     repository: devspace-simulation
-    tag: isaacgym-4-def-01-10172023-focal-xfce
+    tag: isaacgym-4-def-01-10252023-focal-xfce
   context: dockerfiles/simulation/custom/def-01
   path: "."
   dockerfile: "Dockerfile.go1"

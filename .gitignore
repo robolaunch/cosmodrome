@@ -22,3 +22,9 @@
 
 # Go workspace file
 go.work
+
+# compressed files
+*.tar.gz
+*.tar.xz
+*.tar
+*.zip
