@@ -1,0 +1,5 @@
+FROM robolaunchio/custom-metrics-patcher:focal-v1.24.10
+
+RUN apt-get update && apt-get install --only-upgrade -y \
+    libcurl4 \
+    curl

@@ -1,11 +1,7 @@
-FROM quay.io/robolaunchio/platform-initial:gpu-feature-discovery-v0.8.1
+FROM quay.io/robolaunchio/platform-initial:gpu-feature-discovery-v0.8.2
 
 RUN dnf upgrade -y \
-    python3-cloud-what \
-    dnf-plugin-subscription-manager \
-    subscription-manager-rhsm-certificates \
-    python3-syspurpose \
-    python3-subscription-manager-rhsm \
-    subscription-manager
+    platform-python \
+    python3-libs
 
 ENTRYPOINT ["/usr/bin/gpu-feature-discovery"]
