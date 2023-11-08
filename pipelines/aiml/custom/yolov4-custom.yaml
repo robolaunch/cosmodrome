@@ -6,7 +6,7 @@ steps:
 - name: custom-auto-01
   image:
     repository: devspace-aiml
-    tag: custom-auto-01-10162023-focal-xfce
+    tag: custom-auto-01-11082023-focal-xfce
   path: "dockerfiles/aiml/custom/auto-01"
   dockerfile: "Dockerfile.opencv-custom"
   buildArgs:

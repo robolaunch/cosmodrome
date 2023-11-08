@@ -91,6 +91,7 @@ RUN set -eux; \
     opus-tools \
     libopus-dev \
     libgnutls28-dev \
-    librtmp-dev
-
+    librtmp-dev \
+    vlc
+    
 WORKDIR /home/robolaunch
