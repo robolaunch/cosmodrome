@@ -7,7 +7,11 @@ RUN apk update && apk upgrade \
     busybox-binsh \
     ssl_client \
     curl \
-    libcurl
+    libcurl \
+    openssl \
+    libssl3 \
+    libcrypto3 \
+    nghttp2-libs
 
 USER www-data
 
