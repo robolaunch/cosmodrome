@@ -5,7 +5,9 @@ USER root
 RUN apk update && apk upgrade \
     busybox \
     busybox-binsh \
-    ssl_client 
+    ssl_client \
+    curl \
+    libcurl
 
 USER www-data
 
