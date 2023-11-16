@@ -1,0 +1,14 @@
+name: ros2-humble-liosam
+registry: docker.io
+organization: robolaunchio
+version: 0.1.9
+steps:
+- name: liosam
+  image:
+    repository: devspace-robotics
+    tag: ros2-humble-liosam-jammy-xfce-0.1.9
+  path: "dockerfiles/ros2/custom/def-01"
+  dockerfile: "Dockerfile.liosam"
+  buildArgs: 
+    "BASE_IMAGE": "robolaunchio/devspace-robotics:ros2-humble-jammy-xfce-0.1.9"
+  push: false
