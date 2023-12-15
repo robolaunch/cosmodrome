@@ -1,7 +1,7 @@
 name: humble
 registry: docker.io
 organization: robolaunchio
-version: 0.1.9
+version: 0.1.14
 steps:
 - name: humble
   image:
@@ -10,7 +10,7 @@ steps:
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
   buildArgs: 
-    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.9"
+    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.14"
     "ROS_DISTRO_CODE": "humble"
   platforms:
   - "linux/amd64"
