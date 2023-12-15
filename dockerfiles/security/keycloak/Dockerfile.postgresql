@@ -1,4 +1,4 @@
-FROM quay.io/robolaunchio/platform-initial:postgres-13.8-alpine
+FROM quay.io/robolaunchio/platform-initial:postgres-13.8-alpine-vuln
 
 RUN apk update && apk upgrade \
     libxml2 \
