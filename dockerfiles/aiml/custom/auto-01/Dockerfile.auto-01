@@ -94,4 +94,9 @@ RUN set -eux; \
     librtmp-dev \
     vlc
     
+COPY ./requirements.txt .
+
+RUN set -eux; \
+    pip install -r requirements.txt
+    
 WORKDIR /home/robolaunch

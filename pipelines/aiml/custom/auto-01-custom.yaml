@@ -1,0 +1,16 @@
+name: auto-01-custom-auto-01
+registry: docker.io
+organization: robolaunchio
+version: 0.1.14
+steps:
+- name: custom-auto-01
+  image:
+    repository: devspace-aiml
+    tag: custom-auto-01-12182023-focal-xfce
+  context: "dockerfiles/aiml/custom/auto-01"
+  path: "."
+  dockerfile: "Dockerfile.auto-01"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:focal-triton-22.06-py3-xfce-amd64-0.1.14"
+    "OPENCV_VERSION": "3.4.20"
+  push: false
