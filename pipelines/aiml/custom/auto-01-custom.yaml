@@ -1,7 +1,7 @@
 name: auto-01-custom-auto-01
 registry: docker.io
 organization: robolaunchio
-version: 0.1.14
+version: 0.1.15
 steps:
 - name: custom-auto-01
   image:
@@ -11,6 +11,6 @@ steps:
   path: "."
   dockerfile: "Dockerfile.auto-01"
   buildArgs:
-    "BASE_IMAGE": "robolaunchio/devspace:focal-triton-22.06-py3-xfce-amd64-0.1.14"
+    "BASE_IMAGE": "robolaunchio/devspace:focal-triton-22.06-py3-xfce-amd64-0.1.15"
     "OPENCV_VERSION": "3.4.20"
   push: false
