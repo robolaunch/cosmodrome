@@ -1,7 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as build
 ARG YOLOV7_VERSION
-ARG REPOSITORY_PATH="/home/robolaunch/repositories"
+ARG REPOSITORY_PATH="/opt/repositories"
 USER root
 ENV os=ubuntu2004
 ENV cuda_version_dashed=12-0

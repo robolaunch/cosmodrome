@@ -1,6 +1,6 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE} as build
-ARG OPENCV_VERSION=4.5.3
+ARG OPENCV_VERSION=4.8.1
 USER root
 RUN set -eux; \
     apt-get update && apt-get upgrade -y && \
