@@ -1,0 +1,6 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+ARG PYSPARK_VERSION
+SHELL ["/bin/bash", "-c"]
+RUN apt-get update && apt-get install -y python3-pip
+RUN PYSPARK_HADOOP_VERSION=3 pip install pyspark==${PYSPARK_VERSION}
