@@ -1,0 +1,15 @@
+name: custom-def-02
+registry: docker.io
+organization: robolaunchio
+version: 0.1.16
+steps:
+- name: custom-def-02
+  image:
+    repository: devspace-data-science
+    tag: custom-def-02-01052024-pyspark-3.3.2-jammy-xfce
+  path: "dockerfiles/data-science/custom"
+  dockerfile: "Dockerfile.def-02"
+  buildArgs:
+    "BASE_IMAGE": "robolaunchio/devspace:jammy-xfce-0.1.16"
+    "PYSPARK_VERSION": "3.3.2"
+  push: false
