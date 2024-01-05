@@ -1,0 +1,32 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+ARG PYSPARK_VERSION
+SHELL ["/bin/bash", "-c"]
+RUN apt-get update && apt-get install -y python3-pip openjdk-11-jdk-headless
+RUN PYSPARK_HADOOP_VERSION=3 \
+    pip install \
+        pyspark==${PYSPARK_VERSION} \
+        pyarrow \
+        pyod \
+        xgboost \
+        lightgbm \
+        catboost \
+        numpy \
+        scipy \
+        scikit-learn \
+        pandas \
+        scikit-build \
+        matplotlib \
+        plotly \
+        seaborn \
+        geoplotlib \
+        streamlit \
+        Flask \
+        waitress \
+        onnx \
+        onnxruntime \
+        pykafka \
+        kafka-python \
+        elephas \
+        sparktorch \
+        sparkflow
