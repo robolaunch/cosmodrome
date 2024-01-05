@@ -3,8 +3,9 @@ FROM ${BASE_IMAGE}
 ARG PYSPARK_VERSION
 SHELL ["/bin/bash", "-c"]
 RUN apt-get update && apt-get install -y python3-pip openjdk-11-jdk-headless
+RUN pip install --upgrade pip setuptools==57.5.0
 RUN PYSPARK_HADOOP_VERSION=3 \
-    pip install \
+    pip install --ignore-installed \
         pyspark==${PYSPARK_VERSION} \
         pyarrow \
         pyod \
