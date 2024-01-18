@@ -1,7 +1,7 @@
 name: vdi-build
 registry: docker.io
 organization: robolaunchio
-version: 0.1.17
+version: 0.2.6-alpha.18
 steps:
 - name: opencv
   image:
@@ -10,7 +10,7 @@ steps:
   path: "dockerfiles/aiml/libs"
   dockerfile: "Dockerfile.opencv"
   buildArgs:
-    "BASE_IMAGE": "robolaunchio/devspace:focal-cuda-12.0.0-cudnn-xfce-amd64-0.1.17"
+    "BASE_IMAGE": "robolaunchio/devspace:focal-cuda-12.0.0-cudnn-xfce-amd64-0.2.6-alpha.18"
     "OPENCV_VERSION": "4.8.1"
   push: false
 - name: yolov7
