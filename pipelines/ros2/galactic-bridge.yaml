@@ -1,0 +1,31 @@
+name: galactic-bridge
+registry: docker.io
+organization: robolaunchio
+version: 0.2.6-alpha.18
+steps:
+- name: galactic-plain
+  image:
+    repository: devspace-robotics
+    tag: ros2-galactic-plain
+  path: "dockerfiles/ros2"
+  dockerfile: "Dockerfile"
+  buildArgs: 
+    "BASE_IMAGE": "ubuntu:jammy"
+    "ROS_DISTRO_CODE": "galactic"
+  platforms:
+  - "linux/amd64"
+  - "linux/arm64"
+  push: true
+- name: galactic-bridge
+  baseStep: galactic-plain
+  image:
+    repository: devspace-robotics
+    tag: ros2-galactic-bridge
+  path: "dockerfiles/ros2"
+  dockerfile: "Dockerfile.bridge"
+  buildArgs: 
+    "ROS_DISTRO_CODE": "galactic"
+  platforms:
+  - "linux/amd64"
+  - "linux/arm64"
+  push: true

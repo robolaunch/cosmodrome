@@ -1,0 +1,31 @@
+name: humble-bridge
+registry: docker.io
+organization: robolaunchio
+version: 0.2.6-alpha.18
+steps:
+- name: humble-plain
+  image:
+    repository: devspace-robotics
+    tag: ros2-humble-plain
+  path: "dockerfiles/ros2"
+  dockerfile: "Dockerfile"
+  buildArgs: 
+    "BASE_IMAGE": "ubuntu:jammy"
+    "ROS_DISTRO_CODE": "humble"
+  platforms:
+  - "linux/amd64"
+  - "linux/arm64"
+  push: true
+- name: humble-bridge
+  baseStep: humble-plain
+  image:
+    repository: devspace-robotics
+    tag: ros2-humble-bridge
+  path: "dockerfiles/ros2"
+  dockerfile: "Dockerfile.bridge"
+  buildArgs: 
+    "ROS_DISTRO_CODE": "humble"
+  platforms:
+  - "linux/amd64"
+  - "linux/arm64"
+  push: true
