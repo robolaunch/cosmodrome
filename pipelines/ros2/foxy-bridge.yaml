@@ -10,7 +10,7 @@ steps:
   path: "dockerfiles/ros2"
   dockerfile: "Dockerfile"
   buildArgs: 
-    "BASE_IMAGE": "ubuntu:jammy"
+    "BASE_IMAGE": "ubuntu:focal"
     "ROS_DISTRO_CODE": "foxy"
   platforms:
   - "linux/amd64"
