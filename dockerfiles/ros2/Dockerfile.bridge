@@ -1,0 +1,10 @@
+
+ARG BASE_IMAGE="ubuntu:20.04"
+FROM ${BASE_IMAGE}
+
+SHELL ["/bin/bash", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG ROS_DISTRO_CODE=foxy
+
+RUN apt update && apt install -y ros-${ROS_DISTRO_CODE}-rosbridge-suite
