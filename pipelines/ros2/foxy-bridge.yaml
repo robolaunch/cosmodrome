@@ -1,7 +1,7 @@
 name: foxy-bridge
 registry: docker.io
 organization: robolaunchio
-version: 0.2.6-alpha.18
+version: 0.2.6-alpha.19
 steps:
 - name: foxy-plain
   image:

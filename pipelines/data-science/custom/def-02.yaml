@@ -6,7 +6,7 @@ steps:
 - name: custom-def-02
   image:
     repository: devspace-data-science
-    tag: custom-def-02-01052024-pyspark-3.3.2-jammy-xfce
+    tag: custom-def-02-01242024-pyspark-3.3.2-jammy-xfce
   path: "dockerfiles/data-science/custom"
   dockerfile: "Dockerfile.def-02"
   buildArgs:
