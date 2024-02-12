@@ -1,5 +1,0 @@
-FROM quay.io/robolaunchio/platform-initial:node-disk-manager-2.1.0
-
-RUN apt-get update && apt-get install --only-upgrade libssl3 libc-bin libc6 -y
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

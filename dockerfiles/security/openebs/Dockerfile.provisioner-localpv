@@ -1,6 +1,0 @@
-FROM quay.io/robolaunchio/provisioner-localpv:3.4.0-localtest-v10-vuln
-
-RUN apk update && apk upgrade zlib
-RUN apk info | grep zlib* | xargs apk version
-
-ENTRYPOINT ["/usr/local/bin/provisioner-localpv"]

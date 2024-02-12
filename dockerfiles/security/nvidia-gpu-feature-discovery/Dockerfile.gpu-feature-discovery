@@ -1,7 +1,0 @@
-FROM quay.io/robolaunchio/platform-initial:gpu-feature-discovery-v0.8.2
-
-RUN dnf upgrade -y \
-    platform-python \
-    python3-libs
-
-ENTRYPOINT ["/usr/bin/gpu-feature-discovery"]

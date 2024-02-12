@@ -1,8 +1,0 @@
-ARG BASE_IMAGE=robolaunchio/vdi:focal-agnostic-xfce
-FROM ${BASE_IMAGE}
-RUN useradd -m robolaunch -s /bin/bash
-RUN usermod --password robolaunch robolaunch
-RUN sed -i 's/HOME=\"\/root\"/HOME=\"\/home\/robolaunch\"/' /etc/vdi/supervisord/xfce.conf
-RUN sed -i 's/user=root/user=robolaunch/' /etc/vdi/supervisord/xfce.conf
-RUN sed -i 's/USER=\"root\"/USER=\"robolaunch\"/' /etc/vdi/supervisord/xfce.conf
-RUN echo "robolaunch     ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers

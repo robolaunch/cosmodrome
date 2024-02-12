@@ -1,6 +1,0 @@
-ARG BASE_IMAGE=ubuntu:focal
-FROM ${BASE_IMAGE}
-
-RUN apt-get update && apt-get install -y dnsutils
-
-CMD [ "sleep", "infinity" ]

@@ -1,7 +1,0 @@
-FROM quay.io/robolaunchio/platform-initial:k8s-device-plugin-v0.13.0
-
-RUN apt-get update && apt-get install --only-upgrade -y \
-    openssl \
-    libssl1.1
-
-ENTRYPOINT ["nvidia-device-plugin"]

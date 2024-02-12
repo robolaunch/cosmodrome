@@ -1,6 +1,0 @@
-ARG BASE_IMAGE
-FROM ${BASE_IMAGE} as build
-ARG OPENJDK_VERSION
-RUN apt-get update && apt-get install -y openjdk-${OPENJDK_VERSION}
-WORKDIR /home/robolaunch
-USER root

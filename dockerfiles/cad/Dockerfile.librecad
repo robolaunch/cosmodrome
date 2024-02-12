@@ -1,6 +1,0 @@
-ARG BASE_IMAGE
-FROM ${BASE_IMAGE} as build
-ARG LIBRECAD_VERSION
-RUN apt-get update && apt-get install -qy pyqt5-dev-tools librecad=${LIBRECAD_VERSION}
-USER root
-WORKDIR /home/robolaunch
