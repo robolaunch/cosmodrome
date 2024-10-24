@@ -27,22 +27,6 @@ body:
       required: true
 
   - type: textarea
-    id: kubeVersion
-    attributes:
-      label: Kubernetes version
-      value: |
-        <details>
-
-        ```console
-        $ kubectl version
-        # paste output here
-        ```
-
-        </details>
-    validations:
-      required: true
-
-  - type: textarea
     id: network
     attributes:
       label: Container network interface (CNI) and version
